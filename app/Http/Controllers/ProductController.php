@@ -104,7 +104,7 @@ class ProductController extends BaseResourceController {
      * Display the specified resource.
      */
     public function show(Product $product) {
-        $product->load($this->defaultIncludes);
+        $product->with($this->defaultIncludes);
 
         return $this->respond(request(), 'product/show', [
             'item' => ProductData::from($product),

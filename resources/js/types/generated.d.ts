@@ -11,6 +11,7 @@ meta_data: Array<any> | null;
 product_images: Array<App.Data.ProductImageData> | null;
 image_count: number | null;
 formatted_created_at: string | null;
+product_units: Array<App.Data.ProductUnitData> | null;
 };
 export type ProductImageData = {
 id: number | null;
@@ -18,14 +19,51 @@ url: string | null;
 alt_text: string | null;
 is_primary: boolean | null;
 };
-}
-declare namespace App.Data.Product {
-export type ProductData = {
+export type ProductUnitData = {
 id: number | null;
+product_id: number | null;
+unit_type: string | null;
+unit_label: string | null;
+price_per_unit: number | null;
+stock_quantity: number | null;
+is_active: boolean | null;
+sort_order: number | null;
+notes: string | null;
+formatted_price_per_unit: string | null;
+};
+}
+declare namespace App.Data.Product.Show {
+export type ProductData = {
+id: number;
 name: string | null;
+description: string | null;
+harvest_date: string | null;
+expiry_date: string | null;
 is_active: boolean | null;
 created_by: number | null;
-product_images: Array<App.Data.ProductImageData> | null;
+meta_data: Array<any> | null;
+product_images: Array<App.Data.Product.Show.ProductImageData> | null;
+image_count: number | null;
+formatted_created_at: string | null;
+product_units: Array<App.Data.Product.Show.ProductUnitData> | null;
+};
+export type ProductImageData = {
+id: number;
+url: string;
+alt_text: string;
+is_primary: boolean;
+};
+export type ProductUnitData = {
+id: number;
+product_id: number | null;
+unit_type: string | null;
+unit_label: string | null;
+price_per_unit: number | null;
+stock_quantity: number | null;
+is_active: boolean | null;
+sort_order: number | null;
+notes: string | null;
+formatted_price_per_unit: string | null;
 };
 }
 declare namespace App.Models {

@@ -3,15 +3,14 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
-class StoreProductImageRequest extends FormRequest
-{
+class StoreProductImageRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
+    public function authorize(): bool {
+        return true;
     }
 
     /**
@@ -19,10 +18,14 @@ class StoreProductImageRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
+
         return [
-            //
+            'product_id' => ['required', 'exists:products,id'],
+            'images' => ['required', 'array'],
+            'images.*' => ['required', 'image', 'max:10240'], // 10MB max
+            'is_primary' => ['boolean'],
+            'alt_text' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

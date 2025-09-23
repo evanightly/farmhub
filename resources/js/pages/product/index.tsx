@@ -6,9 +6,7 @@ import * as DropdownMenu from '@/components/ui/dropdown-menu';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { useDebounce } from '@uidotdev/usehooks';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
-import { useState } from 'react';
 type Product = App.Data.ProductData;
 
 interface Props {
@@ -37,10 +35,7 @@ export default function Index({ items, filters }: Props) {
 
                 const href = ProductController.show(item.id).url;
                 return (
-                    <Link
-                        href={href}
-                        className="flex items-center gap-2 font-medium hover:underline"
-                    >
+                    <Link href={href} className='flex items-center gap-2 font-medium hover:underline'>
                         {name}
                     </Link>
                 );
@@ -57,8 +52,6 @@ export default function Index({ items, filters }: Props) {
             accessorKey: 'formatted_created_at',
             enableSorting: true,
             cell: ({ row, getValue }) => {
-                console.log(row, getValue());
-
                 const item = row.original;
                 const formattedCreatedAt = getValue() as string;
 
@@ -92,26 +85,20 @@ export default function Index({ items, filters }: Props) {
                 return (
                     <DropdownMenu.DropdownMenu>
                         <DropdownMenu.DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
+                            <Button variant='ghost' className='h-8 w-8 p-0'>
+                                <span className='sr-only'>Open menu</span>
+                                <MoreHorizontal className='h-4 w-4' />
                             </Button>
                         </DropdownMenu.DropdownMenuTrigger>
-                        <DropdownMenu.DropdownMenuContent align="end">
+                        <DropdownMenu.DropdownMenuContent align='end'>
                             <DropdownMenu.DropdownMenuItem asChild>
-                                <Link
-                                    href={ProductController.edit(item.id).url}
-                                    className="flex w-full"
-                                >
-                                    <Edit className="mr-2 h-4 w-4" />
+                                <Link href={ProductController.edit(item.id).url} className='flex w-full'>
+                                    <Edit className='mr-2 h-4 w-4' />
                                     Edit
                                 </Link>
                             </DropdownMenu.DropdownMenuItem>
-                            <DropdownMenu.DropdownMenuItem
-                                onClick={() => handleDelete(item.id as number)}
-                                className="text-destructive"
-                            >
-                                <Trash className="mr-2 h-4 w-4" />
+                            <DropdownMenu.DropdownMenuItem onClick={() => handleDelete(item.id as number)} className='text-destructive'>
+                                <Trash className='mr-2 h-4 w-4' />
                                 Delete
                             </DropdownMenu.DropdownMenuItem>
                         </DropdownMenu.DropdownMenuContent>
@@ -128,41 +115,35 @@ export default function Index({ items, filters }: Props) {
 
     return (
         <AppLayout>
-            <Head title="Products" />
+            <Head title='Products' />
 
             {/* Page Header */}
-            <div className="container mx-auto py-8">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Products
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage your products
-                        </p>
+                        <h1 className='text-3xl font-bold tracking-tight'>Products</h1>
+                        <p className='text-muted-foreground'>Manage your products</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className='flex items-center gap-2'>
                         <Button asChild>
-                            <Link href={ProductController.create().url}>
-                                Create Item
-                            </Link>
+                            <Link href={ProductController.create().url}>Create Item</Link>
                         </Button>
                     </div>
                 </div>
             </div>
 
             <DataTable
-                title="Products"
+                title='Products'
                 data={items.data}
                 columns={columns}
                 pagination={items}
-                searchPlaceholder="Search products..."
+                searchPlaceholder='Search products...'
                 enableSearch={true}
                 enableColumnFilters={true}
                 enableMultiSort={true}
                 routeFunction={ProductController.index}
                 resetRoute={ProductController.index().url}
-                emptyMessage="No products found"
+                emptyMessage='No products found'
                 emptyDescription={
                     filters.search
                         ? 'No products match your search criteria. Try adjusting your filters.'

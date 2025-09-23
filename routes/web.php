@@ -23,6 +23,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('products', ProductController::class)->except(['index']);
     Route::resource('product-images', ProductImageController::class)->except(['index']);
     Route::resource('product-units', ProductUnitController::class)->except(['index']);
+
+    // Product units and images reordering
+    Route::post('products/{product}/units/reorder', [ProductUnitController::class, 'reorder'])->name('products.units.reorder');
+    Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
 });
 
 Route::resource('accounts', AccountController::class)->only(['index']);

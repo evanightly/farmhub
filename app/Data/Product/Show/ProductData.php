@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Data;
+namespace App\Data\Product\Show;
 
 use Spatie\LaravelData\Data;
 
 /** @typescript */
 class ProductData extends Data {
     public function __construct(
-        public ?int $id = null,
+        public int $id,
         public ?string $name = null,
         public ?string $description = null,
         public ?string $harvest_date = null,
