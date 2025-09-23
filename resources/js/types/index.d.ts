@@ -41,3 +41,18 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+// Interfaces for service hooks and data selector
+export interface FilterOptions {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    sort?: string;
+    [key: string]: any;
+}
+
+export interface Resource {
+    id: number;
+    name?: string;
+    [key: string]: any;
+}

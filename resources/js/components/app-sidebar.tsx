@@ -1,3 +1,5 @@
+import ProductController from '@/actions/App/Http/Controllers/ProductController';
+import UserController from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -13,7 +15,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Box, Folder, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +23,16 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'User Management',
+        href: UserController.index().url,
+        icon: Users,
+    },
+    {
+        title: 'Products',
+        href: ProductController.index().url,
+        icon: Box,
     },
 ];
 

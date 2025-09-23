@@ -5,8 +5,7 @@ namespace App\Data;
 use Spatie\LaravelData\Data;
 
 /** @typescript */
-class ProductData extends Data
-{
+class ProductData extends Data {
     public function __construct(
         public ?int $id = null,
         public ?string $name = null,
@@ -18,10 +17,11 @@ class ProductData extends Data
         public ?array $meta_data = null,
         /** @var ProductImageData[]|null */
         public ?array $product_images = null,
+        public ?int $image_count = null,
+        public ?string $formatted_created_at = null
     ) {}
 
-    public static function fromModel($model): self
-    {
+    public static function fromModel($model): self {
         return new self(
             id: $model->id,
             name: $model->name,
@@ -32,6 +32,8 @@ class ProductData extends Data
             created_by: $model->created_by,
             meta_data: $model->meta_data,
             product_images: $model->product_images?->map(fn ($img) => ProductImageData::from($img))?->all(),
+            image_count: $model->product_images?->count(),
+            formatted_created_at: $model->created_at?->toDayDateTimeString()
         );
     }
 }

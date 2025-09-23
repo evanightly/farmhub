@@ -8,32 +8,26 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\QueryFilters\SearchFilter;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
-class ProductController extends BaseResourceController
-{
+class ProductController extends BaseResourceController {
     protected string $modelClass = Product::class;
-
     protected array $allowedFilters = ['search', 'name', 'description'];
-
-    protected array $allowedSorts = ['created_at', 'updated_at'];
-
+    protected array $allowedSorts = ['name', 'created_at', 'updated_at'];
     protected array $allowedIncludes = [
         'product_units',
         'product_images',
         'creator',
         'order_items',
     ];
-
     protected array $defaultIncludes = [
         'product_units',
         'product_images',
     ];
-
     protected array $defaultSorts = ['-updated_at'];
 
     // Override filters aggregation to plug custom filter objects
-    protected function filters(): array
-    {
+    protected function filters(): array {
         return [
             'name',
             'description',
@@ -44,8 +38,7 @@ class ProductController extends BaseResourceController
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $query = $this->buildIndexQuery($request);
 
         $items = $query->paginate($request->get('per_page'))->appends($request->query());
@@ -57,7 +50,7 @@ class ProductController extends BaseResourceController
             return $resource;
         }
 
-        return $this->respond($request, 'bookmark-url/index', [
+        return $this->respond($request, 'product/index', [
             'items' => $resource,
             'filters' => $request->only($this->allowedFilters),
             'sort' => $request->query('sort', $this->defaultSorts),
@@ -67,48 +60,57 @@ class ProductController extends BaseResourceController
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        //
+    public function create() {
+        return Inertia::render('product/create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProductRequest $request)
-    {
-        //
+    public function store(StoreProductRequest $request) {
+        $product = Product::create($request->validated());
+        session()->flash('success', 'Product created successfully');
+
+        return $request->wantsJson() ? response()->json($product, 201) : redirect()->route('products.index');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
-    {
-        //
+    public function show(Product $product) {
+        $product->load($this->defaultIncludes);
+
+        return $this->respond(request(), 'product/show', [
+            'item' => ProductData::from($product),
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
-    {
-        //
+    public function edit(Product $product) {
+        return Inertia::render('product/edit', [
+            'item' => ProductData::from($product->load($this->defaultIncludes)),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateProductRequest $request, Product $product)
-    {
-        //
+    public function update(UpdateProductRequest $request, Product $product) {
+        $product->update($request->validated());
+        session()->flash('success', 'Product updated successfully');
+
+        return $request->wantsJson() ? response()->json($product) : redirect()->route('products.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
-    {
-        //
+    public function destroy(Product $product) {
+        $product->delete();
+        session()->flash('success', 'Product deleted successfully');
+
+        return request()->wantsJson() ? response()->json(null, 204) : redirect()->route('products.index');
     }
 }
