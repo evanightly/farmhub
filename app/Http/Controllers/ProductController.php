@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\QueryFilters\SearchFilter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ProductController extends BaseResourceController {
@@ -68,10 +69,35 @@ class ProductController extends BaseResourceController {
      * Store a newly created resource in storage.
      */
     public function store(StoreProductRequest $request) {
-        $product = Product::create($request->validated());
+        $validated = $request->validated();
+        // Remove images from validated data
+        $images = $request->file('images') ?? [];
+        $isPrimary = $request->boolean('is_primary') ?? [];
+        unset($validated['images'], $validated['is_primary']);
+
+        // Create product
+        $product = Product::create([
+            ...$validated,
+            'created_by' => Auth::id(),
+        ]);
+
+        // Handle image uploads
+        foreach ($images as $index => $image) {
+            $path = $image->store('product-images', 'public');
+
+            $product->product_images()->create([
+                'image_path' => $path,
+                'alt_text' => $validated['name'], // Using product name as alt text
+                'is_primary' => isset($isPrimary[$index]) ? $isPrimary[$index] : false,
+                'sort_order' => $index + 1,
+            ]);
+        }
+
         session()->flash('success', 'Product created successfully');
 
-        return $request->wantsJson() ? response()->json($product, 201) : redirect()->route('products.index');
+        return $request->wantsJson()
+            ? response()->json(ProductData::from($product->load('product_images')), 201)
+            : redirect()->route('products.index');
     }
 
     /**

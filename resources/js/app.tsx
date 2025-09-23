@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { MouseEvent } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from './components/ui/sonner';
 import { initializeTheme } from './hooks/use-appearance';
 import { addRippleEffect } from './pages/helpers/addRippleEffect';
 
@@ -11,11 +12,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'E-Catalog Pertanian';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) =>
-        resolvePageComponent(
-            `./pages/${name}.tsx`,
-            import.meta.glob('./pages/**/*.tsx'),
-        ),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
         document.addEventListener('click', (event) => {
@@ -27,10 +24,15 @@ createInertiaApp({
             }
         });
 
-        root.render(<App {...props} />);
+        root.render(
+            <>
+                <Toaster richColors theme='light' />
+                <App {...props} />
+            </>,
+        );
     },
     progress: {
-        color: '#4B5563',
+        color: 'var(--primary)',
     },
 });
 

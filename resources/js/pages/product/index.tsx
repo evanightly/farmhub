@@ -17,10 +17,6 @@ interface Props {
 }
 
 export default function Index({ items, filters }: Props) {
-    // Define columns for the DataTable with filtering capabilities
-    const [search, setSearch] = useState(filters.search || '');
-    const debouncedSearch = useDebounce(search, 300);
-
     const handleDelete = (id?: number) => {
         if (!id) return;
         if (!confirm('Are you sure you want to delete this item?')) return;
