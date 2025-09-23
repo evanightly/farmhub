@@ -1,17 +1,35 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderItemController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
+use App\Http\Controllers\ProductUnitController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+
+    Route::resource('accounts', AccountController::class)->except(['index']);
+    Route::resource('orders', OrderController::class)->except(['index']);
+    Route::resource('order-items', OrderItemController::class)->except(['index']);
+    Route::resource('payments', PaymentController::class)->except(['index']);
+    Route::resource('products', ProductController::class)->except(['index']);
+    Route::resource('product-images', ProductImageController::class)->except(['index']);
+    Route::resource('product-units', ProductUnitController::class)->except(['index']);
 });
+
+Route::resource('accounts', AccountController::class)->only(['index']);
+Route::resource('orders', OrderController::class)->only(['index']);
+Route::resource('order-items', OrderItemController::class)->only(['index']);
+Route::resource('payments', PaymentController::class)->only(['index']);
+Route::resource('products', ProductController::class)->only(['index']);
+Route::resource('product-images', ProductImageController::class)->only(['index']);
+Route::resource('product-units', ProductUnitController::class)->only(['index']);
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
