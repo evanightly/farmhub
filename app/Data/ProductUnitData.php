@@ -15,7 +15,7 @@ class ProductUnitData extends Data {
     //     'sort_order', // urutan display (kg -> karung -> ton)
     //     'notes', // catatan khusus per unit
     public function __construct(
-        public ?int $id = null,
+        public int $id,
         public ?int $product_id = null,
         public ?string $unit_type = null,
         public ?string $unit_label = null,

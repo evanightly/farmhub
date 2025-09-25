@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\QueryFilters\SearchFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductController extends BaseResourceController {
@@ -71,8 +72,8 @@ class ProductController extends BaseResourceController {
     public function store(StoreProductRequest $request) {
         $validated = $request->validated();
         // Remove images from validated data
-        $images = $request->file('images') ?? [];
-        $isPrimary = $request->boolean('is_primary') ?? [];
+        $images = $request->validated('images', []);
+        $isPrimary = $request->validated('is_primary', []);
         unset($validated['images'], $validated['is_primary']);
 
         // Create product
@@ -127,7 +128,7 @@ class ProductController extends BaseResourceController {
         $product->update($request->validated());
         session()->flash('success', 'Product updated successfully');
 
-        return $request->wantsJson() ? response()->json($product) : redirect()->route('products.index');
+        return $request->wantsJson() ? response()->json(ProductData::from($product->load('product_images'))) : redirect()->route('products.index');
     }
 
     /**

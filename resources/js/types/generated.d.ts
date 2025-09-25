@@ -1,6 +1,6 @@
 declare namespace App.Data {
 export type ProductData = {
-id: number | null;
+id: number;
 name: string | null;
 description: string | null;
 harvest_date: string | null;
@@ -14,13 +14,13 @@ formatted_created_at: string | null;
 product_units: Array<App.Data.ProductUnitData> | null;
 };
 export type ProductImageData = {
-id: number | null;
+id: number;
 url: string | null;
 alt_text: string | null;
 is_primary: boolean | null;
 };
 export type ProductUnitData = {
-id: number | null;
+id: number;
 product_id: number | null;
 unit_type: string | null;
 unit_label: string | null;
