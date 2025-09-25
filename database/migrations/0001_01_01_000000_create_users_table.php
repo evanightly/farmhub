@@ -12,7 +12,7 @@ return new class extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('role')->default('employee'); // 'admin' or 'employee'
+            $table->string('role'); // 'admin' or 'employee'
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
