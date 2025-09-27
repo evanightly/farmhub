@@ -4,14 +4,8 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
-class UserData extends Data
-{
-    // 'name',
-    //     'role', // 'admin', 'employee', 'customer'
-    //     'email',
-    //     'password',
-    //     'products',
-    //     'orders',
+/** @typescript */
+class UserData extends Data {
     public function __construct(
         public int $id,
         public string $name,
@@ -20,6 +14,8 @@ class UserData extends Data
         public ?string $email_verified_at = null,
         public ?string $created_at = null,
         public ?string $updated_at = null,
+        public ?int $product_count = null,
+        public ?int $order_count = null,
         /** @var ProductData[]|null */
         public ?array $products = null,
         /** @var OrderData[]|null */
@@ -35,8 +31,11 @@ class UserData extends Data
             email_verified_at: $model->email_verified_at?->toDateTimeString(),
             created_at: $model->created_at?->toDateTimeString(),
             updated_at: $model->updated_at?->toDateTimeString(),
-            products: $model->products?->map(fn ($prod) => ProductData::from($prod))?->values()?->all(),
-            orders: $model->orders?->map(fn ($order) => OrderData::from($order))?->values()?->all(),
+            // counts: prefer withCount-populated properties to avoid triggering lazy-loading
+            product_count: $model->products_count ?? ($model->relationLoaded('products') ? $model->products?->count() : null),
+            order_count: $model->orders_count ?? ($model->relationLoaded('orders') ? $model->orders?->count() : null),
+            products: $model->relationLoaded('products') ? $model->products?->map(fn ($prod) => ProductData::from($prod))?->values()?->all() : null,
+            orders: $model->relationLoaded('orders') ? $model->orders?->map(fn ($order) => OrderData::from($order))?->values()?->all() : null,
         );
     }
 }

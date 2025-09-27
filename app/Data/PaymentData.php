@@ -5,22 +5,8 @@ namespace App\Data;
 use App\Models\Account;
 use Spatie\LaravelData\Data;
 
+/** @typescript */
 class PaymentData extends Data {
-    //     'order_id',
-    //         'account_id', // foreign key ke accounts table - much better lord!
-    //         'payment_method', // 'bank_transfer', 'e_wallet', 'cash' - untuk offline
-    //         'amount',
-    //         'proof_image_path',
-    //         'payment_date',
-    //         'verified_at',
-    //         'verified_by',
-    //         'notes',
-    //         'reference_number', // nomor referensi dari bank/e-wallet
-
-    // relations
-    // order
-    // account
-    // verifier
     public function __construct(
         public ?int $id,
         public ?int $order_id,

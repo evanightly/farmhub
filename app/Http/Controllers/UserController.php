@@ -12,20 +12,19 @@ use Inertia\Inertia;
 
 class UserController extends BaseResourceController {
     protected string $modelClass = User::class;
-    protected array $allowedFilters = ['search', 'name', 'description'];
-    protected array $allowedSorts = ['name', 'created_at', 'updated_at'];
-    protected array $allowedIncludes = [
-    ];
-    protected array $defaultIncludes = [
-    ];
+    protected array $allowedFilters = ['search', 'name', 'email', 'role'];
+    protected array $allowedSorts = ['name', 'email', 'role', 'created_at', 'updated_at'];
+    protected array $allowedIncludes = ['products', 'orders'];
+    protected array $defaultIncludes = [];
     protected array $defaultSorts = ['-updated_at'];
 
     // Override filters aggregation to plug custom filter objects
     protected function filters(): array {
         return [
             'name',
-            'description',
-            SearchFilter::make(['name', 'description']),
+            'email',
+            'role',
+            SearchFilter::make(['name', 'email']),
         ];
     }
 
@@ -34,21 +33,22 @@ class UserController extends BaseResourceController {
      */
     public function index(Request $request) {
         $query = $this->buildIndexQuery($request);
+        // Optionally include counts for relations without loading their collections.
+        if ($request->query('with_counts') || $request->boolean('with_counts')) {
+            $query = $query->withCount(['products', 'orders']);
+        }
 
         $items = $query->paginate($request->get('per_page'))->appends($request->query());
 
         // Map to Data for consistent frontend typing
         $resource = UserData::collect($items);
 
-        if ($request->wantsJson()) {
-            return $resource;
-        }
-
         return $this->respond($request, 'user/index', [
             'items' => $resource,
             'filters' => $request->only($this->allowedFilters),
             'sort' => $request->query('sort', $this->defaultSorts),
         ]);
+
     }
 
     /**
@@ -66,7 +66,7 @@ class UserController extends BaseResourceController {
         session()->flash('success', 'User created successfully');
 
         return $request->wantsJson()
-            ? response()->json(UserData::from($user->load('user_images')), 201)
+            ? response()->json(UserData::from($user), 201)
             : redirect()->route('users.index');
     }
 
@@ -94,19 +94,34 @@ class UserController extends BaseResourceController {
      * Update the specified resource in storage.
      */
     public function update(UpdateUserRequest $request, User $user) {
-        $user->update($request->validated());
+        $userData = $request->validated();
+        // If password or password_confirmation is not present, remove from the data to avoid setting to null
+        if (!array_key_exists('password', $userData) || empty($userData['password'])) {
+            unset($userData['password']);
+        }
+        if (!array_key_exists('password_confirmation', $userData) || empty($userData['password_confirmation'])) {
+            unset($userData['password_confirmation']);
+        }
+        $user->update($userData);
         session()->flash('success', 'User updated successfully');
 
-        return $request->wantsJson() ? response()->json($user) : redirect()->route('users.index');
+        return $request->wantsJson() ? response()->json(UserData::from($user)) : redirect()->route('users.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user) {
+    public function destroy(Request $request, User $user) {
+        if (auth()->id() === $user->id) {
+            session()->flash('error', 'You cannot delete your own account');
+
+            return $request->wantsJson() ? response()->json(['error' => 'You cannot delete your own account'], 403) : redirect()->back();
+        }
+
         $user->delete();
+
         session()->flash('success', 'User deleted successfully');
 
-        return request()->wantsJson() ? response()->json(null, 204) : redirect()->route('users.index');
+        return $request->wantsJson() ? response()->json(null, 204) : redirect()->route('users.index');
     }
 }

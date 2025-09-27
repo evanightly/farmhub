@@ -4,21 +4,8 @@ namespace App\Data;
 
 use Spatie\LaravelData\Data;
 
+/** @typescript */
 class OrderData extends Data {
-    // 'customer_name',
-    //     'customer_email',
-    //     'customer_phone',
-    //     'shipping_address',
-    //     'total_amount',
-    //     'status', // pending, confirmed, shipped, delivered, cancelled
-    //     'payment_status', // unpaid, paid, verified
-    //     'order_type', // 'online', 'offline' - untuk pembeli langsung ke lokasi
-    //     'processed_by', // admin yang handle
-    //     'notes',
-    // relations:
-    // order_items
-    // payment
-    // processor
     public function __construct(
         public int $id,
         public string $customer_name,
