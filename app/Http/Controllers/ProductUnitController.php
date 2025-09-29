@@ -58,7 +58,12 @@ class ProductUnitController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(UpdateProductUnitRequest $request, ProductUnit $productUnit) {
-        //
+        $productUnit->update($request->validated());
+        session()->flash('success', 'Product unit updated successfully');
+
+        return request()->wantsJson()
+            ? response()->json(ProductUnitData::from($productUnit))
+            : redirect()->route('products.show', $productUnit->product);
     }
 
     /**

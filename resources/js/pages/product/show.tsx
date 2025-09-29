@@ -13,7 +13,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { X as XIcon } from 'lucide-react';
+import { Edit, GripVertical, Trash2, X as XIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -24,6 +24,8 @@ export default function Show({ item }: Props) {
     const [productUnits, setProductUnits] = useState(item.product_units ?? []);
     const [productImages, setProductImages] = useState(item.product_images ?? []);
     const [isAddUnitOpen, setIsAddUnitOpen] = useState(false);
+    const [isEditUnitOpen, setIsEditUnitOpen] = useState(false);
+    const [editingUnit, setEditingUnit] = useState<(typeof productUnits)[0] | null>(null);
     const [isAddImageOpen, setIsAddImageOpen] = useState(false);
 
     const unitForm = useForm({
@@ -33,6 +35,17 @@ export default function Show({ item }: Props) {
         stock_quantity: 0,
         is_active: true,
         sort_order: productUnits.length + 1,
+        notes: '',
+        product_id: item.id,
+    });
+
+    const editUnitForm = useForm({
+        unit_type: '',
+        unit_label: '',
+        price_per_unit: 0,
+        stock_quantity: 0,
+        is_active: true,
+        sort_order: 0,
         notes: '',
         product_id: item.id,
     });
@@ -115,11 +128,47 @@ export default function Show({ item }: Props) {
     };
 
     const handleDeleteUnit = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this unit?')) {
+            return;
+        }
+
         try {
             await axios.delete(ProductUnitController.destroy(id).url);
             setProductUnits((prev) => prev.filter((unit) => unit.id !== id));
         } catch (error) {
             console.error('Failed to delete unit:', error);
+        }
+    };
+
+    const handleEditUnit = (unit: (typeof productUnits)[0]) => {
+        setEditingUnit(unit);
+        editUnitForm.setData({
+            unit_type: unit.unit_type || '',
+            unit_label: unit.unit_label || '',
+            price_per_unit: unit.price_per_unit || 0,
+            stock_quantity: unit.stock_quantity || 0,
+            is_active: unit.is_active ?? true,
+            sort_order: unit.sort_order || 0,
+            notes: unit.notes || '',
+            product_id: item.id,
+        });
+        setIsEditUnitOpen(true);
+    };
+
+    const handleUpdateUnit = async () => {
+        if (!editingUnit) return;
+
+        try {
+            const response = await axios.put(ProductUnitController.update(editingUnit.id).url, editUnitForm.data);
+
+            setProductUnits((prev) =>
+                prev.map((unit) => (unit.id === editingUnit.id ? response.data : unit)).sort((a, b) => a.sort_order - b.sort_order),
+            );
+            setIsEditUnitOpen(false);
+            setEditingUnit(null);
+            editUnitForm.reset();
+        } catch (error) {
+            console.error('Failed to update unit:', error);
         }
     };
 
@@ -228,22 +277,25 @@ export default function Show({ item }: Props) {
                                 <Sortable.Content className='grid grid-cols-2 gap-4 md:grid-cols-3'>
                                     {productImages.map((image) => (
                                         <Sortable.Item key={image.id} value={image.id} className='group relative'>
-                                            <Sortable.ItemHandle>
-                                                <div className='group relative aspect-square cursor-grab overflow-hidden rounded-lg border bg-muted object-cover active:cursor-grabbing'>
-                                                    <img src={image.url} alt={image.alt_text} className='h-full w-full object-cover' />
-                                                </div>
-                                            </Sortable.ItemHandle>
-                                            <Button
-                                                variant='destructive'
-                                                size='icon'
-                                                className='absolute opacity-0 transition-opacity group-hover:opacity-100'
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    handleDeleteImage(image.id);
-                                                }}
-                                            >
-                                                <XIcon className='h-4 w-4' />
-                                            </Button>
+                                            <div className='relative aspect-square overflow-hidden rounded-lg border bg-muted'>
+                                                <img src={image.url} alt={image.alt_text} className='h-full w-full object-cover' />
+
+                                                {/* Drag Handle */}
+                                                <Sortable.ItemHandle className='absolute top-2 left-2 flex h-6 w-6 cursor-grab items-center justify-center rounded bg-black/50 opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 hover:bg-black/70 active:cursor-grabbing'>
+                                                    <GripVertical className='h-3 w-3 text-white' />
+                                                </Sortable.ItemHandle>
+
+                                                {/* Delete Button */}
+                                                <Button
+                                                    ripple={false}
+                                                    variant='destructive'
+                                                    size='icon'
+                                                    className='absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100'
+                                                    onClick={() => handleDeleteImage(image.id)}
+                                                >
+                                                    <XIcon className='h-3 w-3' />
+                                                </Button>
+                                            </div>
                                         </Sortable.Item>
                                     ))}
                                 </Sortable.Content>
@@ -358,6 +410,103 @@ export default function Show({ item }: Props) {
                                     </form>
                                 </DialogContent>
                             </Dialog>
+
+                            {/* Edit Unit Dialog */}
+                            <Dialog open={isEditUnitOpen} onOpenChange={setIsEditUnitOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Edit Unit</DialogTitle>
+                                        <DialogDescription>Update the details for this product unit.</DialogDescription>
+                                    </DialogHeader>
+                                    <form
+                                        onSubmit={(e: React.FormEvent) => {
+                                            e.preventDefault();
+                                            handleUpdateUnit();
+                                        }}
+                                    >
+                                        <div className='grid gap-4 py-4'>
+                                            <div className='grid gap-2'>
+                                                <Label htmlFor='edit_unit_type'>Unit Type</Label>
+                                                <Command className='border'>
+                                                    <CommandInput placeholder='Search unit type...' />
+                                                    <CommandList>
+                                                        <CommandEmpty>No unit type found.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {['kg', 'karung', 'ton', 'pieces', 'ikat'].map((type) => (
+                                                                <CommandItem
+                                                                    key={type}
+                                                                    value={type}
+                                                                    onSelect={() => editUnitForm.setData('unit_type', type)}
+                                                                >
+                                                                    {type}
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </div>
+                                            <div className='grid gap-2'>
+                                                <Label htmlFor='edit_unit_label'>Unit Label</Label>
+                                                <Input
+                                                    id='edit_unit_label'
+                                                    value={editUnitForm.data.unit_label}
+                                                    onChange={(e) => editUnitForm.setData('unit_label', e.target.value)}
+                                                    placeholder='e.g., Karung (25kg)'
+                                                />
+                                            </div>
+                                            <div className='grid gap-2'>
+                                                <Label htmlFor='edit_price_per_unit'>Price per Unit</Label>
+                                                <Input
+                                                    id='edit_price_per_unit'
+                                                    type='number'
+                                                    value={editUnitForm.data.price_per_unit}
+                                                    onChange={(e) => editUnitForm.setData('price_per_unit', Number(e.target.value))}
+                                                />
+                                            </div>
+                                            <div className='grid gap-2'>
+                                                <Label htmlFor='edit_stock_quantity'>Stock Quantity</Label>
+                                                <Input
+                                                    id='edit_stock_quantity'
+                                                    type='number'
+                                                    value={editUnitForm.data.stock_quantity}
+                                                    onChange={(e) => editUnitForm.setData('stock_quantity', Number(e.target.value))}
+                                                />
+                                            </div>
+                                            <div className='grid gap-2'>
+                                                <Label htmlFor='edit_notes'>Notes</Label>
+                                                <Textarea
+                                                    id='edit_notes'
+                                                    value={editUnitForm.data.notes || ''}
+                                                    onChange={(e) => editUnitForm.setData('notes', e.target.value)}
+                                                    placeholder='Any special notes about this unit'
+                                                />
+                                            </div>
+                                            <div className='flex items-center gap-2'>
+                                                <Switch
+                                                    id='edit_is_active'
+                                                    checked={editUnitForm.data.is_active}
+                                                    onCheckedChange={(checked) => editUnitForm.setData('is_active', checked)}
+                                                />
+                                                <Label htmlFor='edit_is_active'>Active</Label>
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button
+                                                type='button'
+                                                variant='outline'
+                                                onClick={() => {
+                                                    setIsEditUnitOpen(false);
+                                                    setEditingUnit(null);
+                                                    editUnitForm.reset();
+                                                }}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button type='submit'>Update Unit</Button>
+                                        </DialogFooter>
+                                    </form>
+                                </DialogContent>
+                            </Dialog>
                         </CardHeader>
                         <CardContent>
                             <Sortable.Root
@@ -369,38 +518,45 @@ export default function Show({ item }: Props) {
                                 <Sortable.Content className='space-y-2'>
                                     {productUnits.map((unit) => (
                                         <Sortable.Item key={unit.id} value={unit.id} className='relative'>
-                                            <Sortable.ItemHandle>
-                                                <div className='group flex cursor-grab items-center justify-between rounded-lg border border-border/50 bg-gradient-to-br from-card to-card/95 p-6 shadow-sm transition-all hover:border-border hover:shadow-md active:cursor-grabbing'>
-                                                    <div className='space-y-2'>
-                                                        <div className='flex items-center gap-2'>
-                                                            <h4 className='font-medium tracking-tight'>{unit.unit_label}</h4>
-                                                            {!unit.is_active && (
-                                                                <span className='rounded-full bg-secondary/10 px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
-                                                                    Inactive
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <div className='flex gap-4'>
-                                                            <div className='flex items-center gap-1.5'>
-                                                                <span className='text-xs font-medium text-muted-foreground uppercase'>Stock</span>
-                                                                <span className='text-sm font-medium'>{unit.stock_quantity}</span>
-                                                            </div>
-                                                            <div className='flex items-center gap-1.5'>
-                                                                <span className='text-xs font-medium text-muted-foreground uppercase'>Price</span>
-                                                                <span className='text-sm font-medium'>{unit.formatted_price_per_unit}</span>
-                                                            </div>
-                                                        </div>
-                                                        {unit.notes && <p className='mt-1 text-sm text-muted-foreground'>{unit.notes}</p>}
-                                                    </div>
+                                            <div className='group flex items-center gap-3 rounded-lg border border-border/50 bg-gradient-to-br from-card to-card/95 p-6 shadow-sm transition-all hover:border-border hover:shadow-md'>
+                                                {/* Drag Handle */}
+                                                <Sortable.ItemHandle className='flex h-6 w-6 cursor-grab items-center justify-center rounded opacity-40 transition-opacity hover:bg-muted hover:opacity-100 active:cursor-grabbing'>
+                                                    <GripVertical className='h-4 w-4 text-muted-foreground' />
+                                                </Sortable.ItemHandle>
+
+                                                {/* Unit Content */}
+                                                <div className='flex-1 space-y-2'>
                                                     <div className='flex items-center gap-2'>
+                                                        <h4 className='font-medium tracking-tight'>{unit.unit_label}</h4>
                                                         {!unit.is_active && (
-                                                            <span className='rounded bg-secondary px-2 py-1 text-xs text-secondary-foreground'>
+                                                            <span className='rounded-full bg-secondary/10 px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
                                                                 Inactive
                                                             </span>
                                                         )}
                                                     </div>
+                                                    <div className='flex gap-4'>
+                                                        <div className='flex items-center gap-1.5'>
+                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Stock</span>
+                                                            <span className='text-sm font-medium'>{unit.stock_quantity}</span>
+                                                        </div>
+                                                        <div className='flex items-center gap-1.5'>
+                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Price</span>
+                                                            <span className='text-sm font-medium'>{unit.formatted_price_per_unit}</span>
+                                                        </div>
+                                                    </div>
+                                                    {unit.notes && <p className='mt-1 text-sm text-muted-foreground'>{unit.notes}</p>}
                                                 </div>
-                                            </Sortable.ItemHandle>
+
+                                                {/* Action Buttons */}
+                                                <div className='flex items-center gap-2'>
+                                                    <Button variant='secondary' size='sm' onClick={() => handleEditUnit(unit)}>
+                                                        <Edit />
+                                                    </Button>
+                                                    <Button variant='destructive' size='sm' onClick={() => handleDeleteUnit(unit.id)}>
+                                                        <Trash2 />
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </Sortable.Item>
                                     ))}
                                 </Sortable.Content>

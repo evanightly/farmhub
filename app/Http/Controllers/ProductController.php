@@ -71,10 +71,6 @@ class ProductController extends BaseResourceController {
      */
     public function store(StoreProductRequest $request) {
         $validated = $request->validated();
-        // Remove images from validated data
-        $images = $request->validated('images', []);
-        $isPrimary = $request->validated('is_primary', []);
-        unset($validated['images'], $validated['is_primary']);
 
         // Create product
         $product = Product::create([
@@ -82,23 +78,11 @@ class ProductController extends BaseResourceController {
             'created_by' => Auth::id(),
         ]);
 
-        // Handle image uploads
-        foreach ($images as $index => $image) {
-            $path = $image->store('product-images', 'public');
-
-            $product->product_images()->create([
-                'image_path' => $path,
-                'alt_text' => $validated['name'], // Using product name as alt text
-                'is_primary' => isset($isPrimary[$index]) ? $isPrimary[$index] : false,
-                'sort_order' => $index + 1,
-            ]);
-        }
-
-        session()->flash('success', 'Product created successfully');
+        session()->flash('success', 'Product created successfully. You can now add images and units.');
 
         return $request->wantsJson()
-            ? response()->json(ProductData::from($product->load('product_images')), 201)
-            : redirect()->route('products.index');
+            ? response()->json(ProductData::from($product), 201)
+            : redirect()->route('products.show', $product);
     }
 
     /**
