@@ -3,20 +3,13 @@ import UserController from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Box, Folder, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, Box, CreditCard, Folder, LayoutGrid, Package, Users } from 'lucide-react';
 import AppLogo from './app-logo';
+import { orders, payments } from '@/routes/admin';
 
 const mainNavItems: NavItem[] = [
     {
@@ -33,6 +26,16 @@ const mainNavItems: NavItem[] = [
         title: 'Products',
         href: ProductController.index().url,
         icon: Box,
+    },
+    {
+        title: 'Order Management',
+        href: orders(),
+        icon: Package,
+    },
+    {
+        title: 'Payment Verification',
+        href: payments(),
+        icon: CreditCard,
     },
 ];
 
@@ -51,11 +54,11 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible='icon' variant='inset'>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        <SidebarMenuButton size='lg' asChild>
                             <Link href={dashboard()} prefetch>
                                 <AppLogo />
                             </Link>
@@ -69,7 +72,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={footerNavItems} className='mt-auto' />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

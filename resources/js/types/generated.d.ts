@@ -14,6 +14,7 @@ payments: Array<App.Data.PaymentData> | null;
 };
 export type OrderData = {
 id: number;
+access_token: string;
 customer_name: string;
 customer_email: string;
 customer_phone: string | null;
@@ -115,8 +116,10 @@ email: string;
 email_verified_at: string | null;
 created_at: string | null;
 updated_at: string | null;
-products: Array<App.Data.ProductSummaryData> | null;
-orders: Array<App.Data.OrderSummaryData> | null;
+product_count: number | null;
+order_count: number | null;
+products: Array<App.Data.ProductData> | null;
+orders: Array<App.Data.OrderData> | null;
 };
 }
 declare namespace App.Data.Product.Show {

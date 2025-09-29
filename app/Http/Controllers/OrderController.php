@@ -11,89 +11,83 @@ use App\Models\Account;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Product;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OrderController extends Controller {
-    /**
-     * Display a listing of the resource.
-     */
     public function index() {
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create() {
         //
     }
 
-    /**
-     * Show the checkout form with available payment accounts.
-     */
     public function checkout() {
-        $accounts = Account::active()->ordered()->get();
+        $accounts = Account::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($account) => AccountData::from($account));
 
         return Inertia::render('checkout', [
-            'accounts' => $accounts->map(fn ($account) => AccountData::from($account)),
+            'accounts' => $accounts,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreOrderRequest $request) {
         try {
             DB::beginTransaction();
 
             $validated = $request->validated();
 
-            // Get the selected account
-            $selectedAccount = Account::findOrFail($validated['selected_account_id']);
-
-            // Create the order
             $order = Order::create([
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_phone' => $validated['customer_phone'],
                 'shipping_address' => $validated['shipping_address'],
-                'notes' => $validated['notes'],
                 'total_amount' => $validated['total_amount'],
                 'status' => 'pending',
                 'payment_status' => 'unpaid',
                 'order_type' => 'online',
-                'processed_by' => Auth::id(), // Will be null for non-authenticated users
+                'notes' => $validated['notes'],
             ]);
 
-            // Create order items
             foreach ($validated['order_items'] as $item) {
+                $product = Product::findOrFail($item['product_id']);
+
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
+                    'product_id' => $product->id,
                     'product_unit_id' => $item['product_unit_id'],
-                    'product_name' => $item['product_name'],
-                    'unit_label' => $item['unit_label'],
+                    'product_name' => $product->name,
                     'product_price' => $item['product_price'],
                     'quantity' => $item['quantity'],
-                    'subtotal' => $item['subtotal'],
+                    'unit_label' => $item['unit_label'],
+                    'subtotal' => $item['quantity'] * $item['product_price'],
                 ]);
             }
 
-            // Create payment record with selected account
+            $selectedAccount = Account::findOrFail($validated['selected_account_id']);
+
             $payment = Payment::create([
                 'order_id' => $order->id,
                 'account_id' => $selectedAccount->id,
-                'payment_method' => $selectedAccount->account_type,
                 'amount' => $validated['total_amount'],
-                'notes' => 'Payment pending - created from checkout',
+                'payment_method' => $selectedAccount->account_type,
+                'payment_date' => now(),
             ]);
 
             DB::commit();
 
-            // Redirect to payment instructions page
-            return redirect()->route('payment-instructions', ['order' => $order->id]);
+            return redirect()->route('payment-instructions', $order);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -105,44 +99,191 @@ class OrderController extends Controller {
         }
     }
 
-    /**
-     * Show payment instructions for the order
-     */
     public function paymentInstructions(Order $order) {
-        // Load the order with its payment and account details
         $order->load(['payment.account', 'order_items']);
+
+        // Generate QR code for transaction reference with access token
+        $transactionUrl = url("/orders/{$order->id}?token={$order->access_token}");
+        $qrCodeDataUri = $this->generateQrCode($transactionUrl);
 
         return Inertia::render('payment-instructions', [
             'order' => OrderData::from($order),
             'payment' => $order->payment ? PaymentData::from($order->payment) : null,
             'account' => $order->payment?->account ? AccountData::from($order->payment->account) : null,
+            'qrCodeDataUri' => $qrCodeDataUri,
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order) {
-        //
+    private function generateQrCode(string $url): string {
+        $result = new Builder(
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            size: 200,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            writer: new PngWriter,
+        );
+
+        return $result->build()->getDataUri();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    public function transactions(Request $request) {
+        $email = $request->get('email');
+        $orders = collect();
+
+        // Security: Only allow searching own email if authenticated, or specific email if admin
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // If admin, allow searching any email
+            if ($user->role === 'admin' || $user->role === 'employee') { // You can adjust admin check logic
+                if ($email) {
+                    $orders = Order::where('customer_email', $email)
+                        ->with(['order_items.product', 'payment'])
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->map(fn ($order) => OrderData::from($order));
+                }
+            } else {
+                // Regular users can only see their own orders
+                $orders = Order::where('customer_email', $user->email)
+                    ->with(['order_items.product', 'payment'])
+                    ->orderBy('created_at', 'desc')
+                    ->get()
+                    ->map(fn ($order) => OrderData::from($order));
+            }
+        } else {
+            // Unauthenticated users cannot search by email for security
+            if ($email) {
+                // Return empty result for security
+                $orders = collect();
+            }
+        }
+
+        return Inertia::render('transactions', [
+            'orders' => $orders,
+            'searchEmail' => Auth::check() ? $email : null,
+            'isAdmin' => Auth::check() && (Auth::user()?->role === 'admin' || Auth::user()?->role === 'employee'),
+        ]);
+    }
+
+    public function adminDashboard() {
+        // Ensure only admin or employee can access
+        if (!Auth::check() || (Auth::user()?->role !== 'admin' && Auth::user()?->role !== 'employee')) {
+            abort(403, 'Admin or employee access required.');
+        }
+
+        $stats = [
+            'total_orders' => Order::count(),
+            'pending_orders' => Order::where('status', 'pending')->count(),
+            'confirmed_orders' => Order::where('status', 'confirmed')->count(),
+            'shipped_orders' => Order::where('status', 'shipped')->count(),
+            'delivered_orders' => Order::where('status', 'delivered')->count(),
+            'total_revenue' => Order::where('payment_status', 'verified')->sum('total_amount'),
+            'total_customers' => Order::distinct('customer_email')->count('customer_email'),
+            'total_products' => Product::count(),
+        ];
+
+        return Inertia::render('admin-dashboard', [
+            'stats' => $stats,
+        ]);
+    }
+
+    public function adminOrders(Request $request) {
+        // Ensure only admin or employee can access
+        if (!Auth::check() || (Auth::user()?->role !== 'admin' && Auth::user()?->role !== 'employee')) {
+            abort(403, 'Admin or employee access required.');
+        }
+
+        $query = Order::query()->with(['order_items.product', 'payment']);
+
+        if ($search = $request->input('filter.search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('customer_email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('filter.status')) {
+            $query->where('status', $status);
+        }
+
+        if ($paymentStatus = $request->input('filter.payment_status')) {
+            $query->where('payment_status', $paymentStatus);
+        }
+
+        if ($dateFrom = $request->input('filter.date_from')) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo = $request->input('filter.date_to')) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return Inertia::render('admin-orders', [
+            'orders' => $orders->through(fn ($order) => OrderData::from($order)),
+            'filters' => $request->only(['filter', 'sort', 'page', 'per_page']),
+        ]);
+    }
+
+    public function updateStatus(Request $request, Order $order) {
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled',
+        ]);
+
+        $order->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Order status updated successfully.');
+    }
+
+    public function show(Request $request, Order $order) {
+        // Security check: Verify access token for unauthenticated users
+        $isQrAccess = false;
+        $accessToken = null;
+
+        if (!Auth::check()) {
+            $token = $request->get('token');
+            if (!$token || $token !== $order->access_token) {
+                abort(403, 'Unauthorized access to this order.');
+            }
+            $isQrAccess = true;
+            $accessToken = $token;
+        } else {
+            // Authenticated users: Admin can see all, users can only see their own
+            $user = Auth::user();
+            if ($user->role !== 'admin' && $user->role !== 'employee' && $order->customer_email !== $user->email) {
+                abort(403, 'Unauthorized access to this order.');
+            }
+        }
+
+        $order->load([
+            'order_items.product.product_units',
+            'payment.account',
+            'processor',
+        ]);
+
+        return Inertia::render('order-details', [
+            'order' => OrderData::from($order),
+            'isQrAccess' => $isQrAccess,
+            'accessToken' => $accessToken,
+            'canUploadPayment' => $isQrAccess && in_array($order->payment_status, ['unpaid', 'pending', 'rejected']),
+        ]);
+    }
+
     public function edit(Order $order) {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateOrderRequest $request, Order $order) {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Order $order) {
         //
     }

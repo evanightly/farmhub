@@ -8,6 +8,7 @@ use Spatie\LaravelData\Data;
 class OrderData extends Data {
     public function __construct(
         public int $id,
+        public string $access_token, // Non-nullable since always generated
         public string $customer_name,
         public string $customer_email,
         public ?string $customer_phone,
@@ -30,6 +31,7 @@ class OrderData extends Data {
     public static function fromModel($model): self {
         return new self(
             id: $model->id,
+            access_token: $model->access_token,
             customer_name: $model->customer_name,
             customer_email: $model->customer_email,
             customer_phone: $model->customer_phone,
