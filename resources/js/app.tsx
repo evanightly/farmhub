@@ -5,6 +5,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { MouseEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from './components/ui/sonner';
+import { CartProvider } from './contexts/CartContext';
 import { initializeTheme } from './hooks/use-appearance';
 import { addRippleEffect } from './pages/helpers/addRippleEffect';
 
@@ -25,10 +26,10 @@ createInertiaApp({
         });
 
         root.render(
-            <>
+            <CartProvider>
                 <Toaster richColors theme='light' />
                 <App {...props} />
-            </>,
+            </CartProvider>,
         );
     },
     progress: {

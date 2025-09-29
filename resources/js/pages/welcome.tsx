@@ -4,7 +4,8 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import * as Card from '@/components/ui/card';
 import * as Dialog from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { dashboard, login, register } from '@/routes';
+import { useCart } from '@/contexts/CartContext';
+import { cart, dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useDebounce } from '@uidotdev/usehooks';
@@ -17,21 +18,10 @@ export default function Welcome() {
     const [searchTerm, setSearchTerm] = React.useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const [products, setProducts] = React.useState<App.Data.ProductData[]>([]);
-    const [cart, setCart] = React.useState<{ [key: string]: number }>({});
+    const { addToCart, getTotalItems, getItemQuantity } = useCart();
 
     const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-    };
-
-    const addToCart = (unitId: string) => {
-        setCart((prev) => ({
-            ...prev,
-            [unitId]: (prev[unitId] || 0) + 1,
-        }));
-    };
-
-    const getCartCount = () => {
-        return Object.values(cart).reduce((sum, count) => sum + count, 0);
     };
 
     React.useEffect(() => {
@@ -83,13 +73,15 @@ export default function Welcome() {
                             <Button asChild variant={'ghost'} size={'icon'}>
                                 <AnimatedThemeToggler />
                             </Button>
-                            <Button variant={'ghost'} size={'icon'} className='relative' ripple={false}>
-                                <ShoppingCart className='h-5 w-5' />
-                                {getCartCount() > 0 && (
-                                    <span className='absolute -top-1 -right-1 z-50 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground'>
-                                        {getCartCount()}
-                                    </span>
-                                )}
+                            <Button asChild variant={'ghost'} size={'icon'} className='relative' ripple={false}>
+                                <Link href={cart()}>
+                                    <ShoppingCart className='h-5 w-5' />
+                                    {getTotalItems() > 0 && (
+                                        <span className='absolute -top-1 -right-1 z-50 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground'>
+                                            {getTotalItems() > 99 ? '99+' : getTotalItems()}
+                                        </span>
+                                    )}
+                                </Link>
                             </Button>
                             {auth.user ? (
                                 <Link href={dashboard()} className={buttonVariants()}>
@@ -112,7 +104,7 @@ export default function Welcome() {
                     {products.length > 0 ? (
                         <div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                             {products.map((product) => (
-                                <ProductCard key={product.id} product={product} onAddToCart={addToCart} cartItems={cart} />
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     ) : (
@@ -132,19 +124,27 @@ export default function Welcome() {
     );
 }
 
-const ProductCard = ({
-    product,
-    onAddToCart,
-    cartItems,
-}: {
-    product: App.Data.ProductData;
-    onAddToCart: (unitId: string) => void;
-    cartItems: { [key: string]: number };
-}) => {
+const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
     const primaryImage = product.product_images?.find((img) => img.is_primary) || product.product_images?.[0];
     const [selectedUnit, setSelectedUnit] = React.useState(product.product_units?.[0]?.id?.toString() || '');
+    const { addToCart, getItemQuantity } = useCart();
 
     const selectedUnitData = product.product_units?.find((unit) => unit.id.toString() === selectedUnit);
+
+    const handleAddToCart = () => {
+        if (!selectedUnitData) return;
+
+        addToCart({
+            unitId: selectedUnitData.id.toString(),
+            productId: product.id,
+            productName: product.name || '',
+            unitType: selectedUnitData.unit_type || '',
+            unitLabel: selectedUnitData.unit_label || selectedUnitData.unit_type || '',
+            pricePerUnit: selectedUnitData.price_per_unit || 0,
+            stockQuantity: selectedUnitData.stock_quantity || 0,
+            productImage: primaryImage?.url || undefined,
+        });
+    };
 
     return (
         <Card.Card className='group overflow-hidden border-0 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg'>
@@ -191,7 +191,7 @@ const ProductCard = ({
                     <Button
                         size='sm'
                         className='h-8 w-8 rounded-full shadow-lg'
-                        onClick={() => selectedUnitData && onAddToCart(selectedUnitData.id.toString())}
+                        onClick={handleAddToCart}
                         disabled={!selectedUnitData || (selectedUnitData.stock_quantity || 0) === 0}
                     >
                         <Plus className='h-4 w-4' />
@@ -250,12 +250,14 @@ const ProductCard = ({
                                     <div className='text-sm text-muted-foreground'>per {selectedUnitData.unit_type}</div>
                                     <Button
                                         size='sm'
-                                        onClick={() => onAddToCart(selectedUnitData.id.toString())}
+                                        onClick={handleAddToCart}
                                         disabled={(selectedUnitData.stock_quantity || 0) === 0}
                                         className='flex-shrink-0'
                                     >
                                         <Plus className='mr-1 h-4 w-4' />
-                                        Add {(cartItems[selectedUnitData.id.toString()] || 0) > 0 && `(${cartItems[selectedUnitData.id.toString()]})`}
+                                        Add{' '}
+                                        {getItemQuantity(selectedUnitData.id.toString()) > 0 &&
+                                            `(${getItemQuantity(selectedUnitData.id.toString())})`}
                                     </Button>
                                 </div>
                             </div>
