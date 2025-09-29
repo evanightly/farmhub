@@ -43,9 +43,9 @@ class OrderData extends Data {
             notes: $model->notes,
             created_at: $model->created_at?->toDateTimeString(),
             updated_at: $model->updated_at?->toDateTimeString(),
-            order_items: $model->order_items?->map(fn ($item) => OrderItemData::from($item))?->values()?->all(),
-            payment: $model->payment ? PaymentData::from($model->payment) : null,
-            processor: $model->processor ? UserData::from($model->processor) : null,
+            order_items: $model->relationLoaded('order_items') ? $model->order_items?->map(fn ($item) => OrderItemData::from($item))?->values()?->all() : null,
+            payment: $model->relationLoaded('payment') ? ($model->payment ? PaymentData::from($model->payment) : null) : null,
+            processor: $model->relationLoaded('processor') ? ($model->processor ? UserData::from($model->processor) : null) : null,
         );
     }
 }

@@ -392,3 +392,51 @@
     animation: none;
     mix-blend-mode: normal;
 }
+
+/* Print styles for payment instructions */
+@media print {
+    @page {
+        margin: 0.5in;
+        size: A4;
+    }
+
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+        color: black !important;
+        background: white !important;
+    }
+
+    .print-break-before {
+        page-break-before: always;
+    }
+
+    .print-break-after {
+        page-break-after: always;
+    }
+
+    .print-avoid-break {
+        page-break-inside: avoid;
+    }
+
+    /* Hide shadows and backgrounds for cleaner print */
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    /* Ensure good contrast for print */
+    .text-muted-foreground {
+        color: #666 !important;
+    }
+
+    .border {
+        border-color: #ddd !important;
+    }
+
+    /* Make cards more print-friendly */
+    .bg-muted\/50,
+    .bg-primary\/5 {
+        background-color: #f5f5f5 !important;
+    }
+}

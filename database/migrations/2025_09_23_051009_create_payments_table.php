@@ -4,13 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+    public function up(): void {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
@@ -18,7 +16,7 @@ return new class extends Migration
             $table->enum('payment_method', ['bank_transfer', 'e_wallet', 'cash']);
             $table->decimal('amount', 15, 2);
             $table->string('proof_image_path')->nullable();
-            $table->dateTime('payment_date');
+            $table->dateTime('payment_date')->nullable();
             $table->dateTime('verified_at')->nullable();
             $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();
             $table->text('notes')->nullable();
@@ -30,8 +28,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('payments');
     }
 };

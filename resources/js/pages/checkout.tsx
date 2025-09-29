@@ -3,17 +3,22 @@ import { Button } from '@/components/ui/button';
 import * as Card from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useCart } from '@/contexts/CartContext';
 import { cart, checkout, dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, CreditCard, Mail, MapPin, Package, Phone, ShoppingCart, User } from 'lucide-react';
+import { ArrowLeft, Banknote, CreditCard, Mail, MapPin, Package, Phone, ShoppingCart, Smartphone, User, Wallet } from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
 
-export default function Checkout() {
+interface CheckoutProps {
+    accounts: App.Data.AccountData[];
+}
+
+export default function Checkout({ accounts }: CheckoutProps) {
     const { auth } = usePage<SharedData>().props;
     const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -25,6 +30,7 @@ export default function Checkout() {
         customer_phone: '',
         shipping_address: '',
         notes: '',
+        selected_account_id: '',
     });
 
     const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -52,6 +58,21 @@ export default function Checkout() {
         }
     };
 
+    const handleAccountSelection = (accountId: string) => {
+        setFormData((prev) => ({
+            ...prev,
+            selected_account_id: accountId,
+        }));
+
+        // Clear error when account is selected
+        if (errors.selected_account_id) {
+            setErrors((prev) => ({
+                ...prev,
+                selected_account_id: '',
+            }));
+        }
+    };
+
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
 
@@ -71,6 +92,10 @@ export default function Checkout() {
 
         if (!formData.shipping_address.trim()) {
             newErrors.shipping_address = 'Shipping address is required';
+        }
+
+        if (!formData.selected_account_id) {
+            newErrors.selected_account_id = 'Please select a payment method';
         }
 
         setErrors(newErrors);
@@ -102,6 +127,7 @@ export default function Checkout() {
                 shipping_address: formData.shipping_address,
                 notes: formData.notes,
                 total_amount: getTotalPrice(),
+                selected_account_id: formData.selected_account_id,
                 order_items: items.map((item) => ({
                     product_id: item.productId,
                     product_unit_id: parseInt(item.unitId),
@@ -287,6 +313,71 @@ export default function Checkout() {
                                                 rows={2}
                                             />
                                         </div>
+                                    </Card.CardContent>
+                                </Card.Card>
+
+                                <Card.Card>
+                                    <Card.CardHeader>
+                                        <Card.CardTitle className='flex items-center gap-2'>
+                                            <CreditCard className='h-5 w-5' />
+                                            Payment Method
+                                        </Card.CardTitle>
+                                        <Card.CardDescription>Choose your preferred payment method for this order.</Card.CardDescription>
+                                    </Card.CardHeader>
+                                    <Card.CardContent className='space-y-4'>
+                                        <RadioGroup value={formData.selected_account_id} onValueChange={handleAccountSelection}>
+                                            <div className='space-y-3'>
+                                                {accounts.map((account) => {
+                                                    const Icon =
+                                                        account.account_type === 'bank_transfer'
+                                                            ? Banknote
+                                                            : account.account_type === 'e_wallet'
+                                                              ? Smartphone
+                                                              : Wallet;
+                                                    const isSelected = formData.selected_account_id === account.id.toString();
+                                                    return (
+                                                        <div key={account.id} className='relative'>
+                                                            <RadioGroupItem
+                                                                value={account.id.toString()}
+                                                                id={`account-${account.id}`}
+                                                                className='sr-only'
+                                                            />
+                                                            <Label
+                                                                htmlFor={`account-${account.id}`}
+                                                                className={`flex cursor-pointer items-center space-x-3 rounded-lg border p-4 transition-all hover:border-primary/50 hover:bg-muted/50 ${
+                                                                    isSelected
+                                                                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                                                        : 'border-border'
+                                                                }`}
+                                                            >
+                                                                <div
+                                                                    className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                                                                        isSelected ? 'border-primary bg-primary' : 'border-muted-foreground'
+                                                                    }`}
+                                                                >
+                                                                    {isSelected && <div className='h-2 w-2 rounded-full bg-primary-foreground' />}
+                                                                </div>
+                                                                <div className='flex flex-1 items-center space-x-3'>
+                                                                    <Icon className='h-5 w-5 text-muted-foreground' />
+                                                                    <div className='flex-1'>
+                                                                        <div className='font-medium'>{account.account_name}</div>
+                                                                        <p className='text-sm text-muted-foreground'>
+                                                                            {account.owner_name} - {account.account_no}
+                                                                        </p>
+                                                                        {account.instructions && (
+                                                                            <p className='mt-1 text-xs text-muted-foreground'>
+                                                                                {account.instructions}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </Label>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </RadioGroup>
+                                        {errors.selected_account_id && <p className='text-sm text-destructive'>{errors.selected_account_id}</p>}
                                     </Card.CardContent>
                                 </Card.Card>
                             </div>

@@ -2,7 +2,6 @@
 
 namespace App\Data;
 
-use App\Models\Account;
 use Spatie\LaravelData\Data;
 
 /** @typescript */
@@ -37,9 +36,9 @@ class PaymentData extends Data {
             verified_by: $model->verified_by,
             notes: $model->notes,
             reference_number: $model->reference_number,
-            order: $model->order ? OrderData::from($model->order) : null,
-            account: $model->account ? AccountData::from($model->account) : null,
-            verifier: $model->verifier ? UserData::from($model->verifier) : null,
+            order: $model->relationLoaded('order') ? ($model->order ? OrderData::from($model->order) : null) : null,
+            account: $model->relationLoaded('account') ? ($model->account ? AccountData::from($model->account) : null) : null,
+            verifier: $model->relationLoaded('verifier') ? ($model->verifier ? UserData::from($model->verifier) : null) : null,
         );
     }
 }
