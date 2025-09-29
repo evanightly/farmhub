@@ -4,12 +4,14 @@ import { Moon, Sun } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
+import { useAppearance } from "@/hooks/use-appearance";
 
 type Props = {
   className?: string;
 };
 
 export const AnimatedThemeToggler = ({ className }: Props) => {
+  const { appearance, updateAppearance } = useAppearance();
   const [isDark, setIsDark] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -32,12 +34,11 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
   const toggleTheme = useCallback(async () => {
     if (!buttonRef.current) return;
 
+    const newTheme = isDark ? 'light' : 'dark';
+
     await document.startViewTransition(() => {
       flushSync(() => {
-        const newTheme = !isDark;
-        setIsDark(newTheme);
-        document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", newTheme ? "dark" : "light");
+        updateAppearance(newTheme);
       });
     }).ready;
 
@@ -63,7 +64,7 @@ export const AnimatedThemeToggler = ({ className }: Props) => {
         pseudoElement: "::view-transition-new(root)",
       },
     );
-  }, [isDark]);
+  }, [isDark, updateAppearance]);
 
   return (
     <button ref={buttonRef} onClick={toggleTheme} className={cn(className)}>

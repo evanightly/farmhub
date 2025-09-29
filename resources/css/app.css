@@ -9,9 +9,7 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -62,20 +60,20 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --background: oklch(0.99 0.01 120);
+    --foreground: oklch(0.15 0.02 140);
+    --card: oklch(0.98 0.01 115);
+    --card-foreground: oklch(0.15 0.02 140);
+    --popover: oklch(0.98 0.01 115);
+    --popover-foreground: oklch(0.15 0.02 140);
+    --primary: oklch(0.45 0.15 135);
+    --primary-foreground: oklch(0.98 0.01 115);
+    --secondary: oklch(0.92 0.02 110);
+    --secondary-foreground: oklch(0.35 0.12 140);
+    --muted: oklch(0.94 0.02 115);
+    --muted-foreground: oklch(0.55 0.05 125);
+    --accent: oklch(0.85 0.08 95);
+    --accent-foreground: oklch(0.25 0.08 140);
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.577 0.245 27.325);
     --border: oklch(0.922 0 0);
@@ -103,20 +101,20 @@
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    --background: oklch(0.08 0.02 140);
+    --foreground: oklch(0.92 0.02 110);
+    --card: oklch(0.12 0.03 135);
+    --card-foreground: oklch(0.92 0.02 110);
+    --popover: oklch(0.12 0.03 135);
+    --popover-foreground: oklch(0.92 0.02 110);
+    --primary: oklch(0.65 0.18 125);
+    --primary-foreground: oklch(0.08 0.02 140);
+    --secondary: oklch(0.18 0.04 130);
+    --secondary-foreground: oklch(0.88 0.03 115);
+    --muted: oklch(0.18 0.04 130);
+    --muted-foreground: oklch(0.65 0.05 120);
+    --accent: oklch(0.25 0.08 100);
+    --accent-foreground: oklch(0.88 0.03 115);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
     --border: oklch(0.269 0 0);
@@ -196,14 +194,10 @@
     --animate-orbit: orbit calc(var(--duration) * 1s) linear infinite;
     @keyframes orbit {
         0% {
-            transform: rotate(calc(var(--angle) * 1deg))
-                translateY(calc(var(--radius) * 1px))
-                rotate(calc(var(--angle) * -1deg));
+            transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg));
         }
         100% {
-            transform: rotate(calc(var(--angle) * 1deg + 360deg))
-                translateY(calc(var(--radius) * 1px))
-                rotate(calc((var(--angle) * -1deg) - 360deg));
+            transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg));
         }
     }
     --animate-shine: shine var(--duration) infinite linear;
@@ -232,8 +226,7 @@
             opacity: 0;
         }
     }
-    --animate-background-position-spin: background-position-spin 3000ms infinite
-        alternate;
+    --animate-background-position-spin: background-position-spin 3000ms infinite alternate;
     @keyframes background-position-spin {
         0% {
             background-position: top center;
@@ -300,8 +293,7 @@
             background-position: 200%;
         }
     }
-    --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite
-        alternate;
+    --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
     --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
     @keyframes shimmer-slide {
         to {
@@ -353,8 +345,7 @@
             transform: translateY(0);
         }
     }
-    --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s)
-        infinite;
+    --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s) infinite;
     @keyframes ripple {
         0%,
         100% {
@@ -394,7 +385,7 @@
         transform: scale(4); /* Ripple grows */
         opacity: 0; /* Ripple fades out */
     }
-}   
+}
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
