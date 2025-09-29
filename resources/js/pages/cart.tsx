@@ -4,7 +4,7 @@ import * as Card from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/CartContext';
-import { cart, dashboard, home, login, register } from '@/routes';
+import { cart, checkout, dashboard, home, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Leaf, Minus, Package, Plus, ShoppingCart, Trash2 } from 'lucide-react';
@@ -197,8 +197,8 @@ export default function Cart() {
                                         </div>
                                     </Card.CardContent>
                                     <Card.CardFooter className='flex flex-col gap-2'>
-                                        <Button className='w-full' size='lg'>
-                                            Proceed to Checkout
+                                        <Button asChild className='w-full' size='lg'>
+                                            <Link href={checkout()}>Proceed to Checkout</Link>
                                         </Button>
                                         <Button variant='outline' className='w-full' asChild>
                                             <Link href={home()}>Continue Shopping</Link>

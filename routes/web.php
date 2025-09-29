@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 Route::inertia('/cart', 'cart')->name('cart');
+Route::inertia('/checkout', 'checkout')->name('checkout');
+Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
