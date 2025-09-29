@@ -11,11 +11,11 @@ Business Process
     - Non-Authenticated Customer
 
     Both store the same details on the order data, i.e. email, phone number even if the user is authenticated`
+
 3.  Cart page
 4.  Payment
 5.  Transaction Page, shows transaction list
-    5a. (Admin) Order Status Handling:
-        - 'status', // pending, confirmed, shipped, delivered, cancelled
-        - 'payment_status', // unpaid, paid, verified
-    5b. (User) Transaction List
-        - Show all user transactions referenced by email, not id
+    5a. (Admin) Order Status Handling: - 'status', // pending, confirmed, shipped, delivered, cancelled - 'payment_status', // unpaid, paid, verified
+    5b. (User) Transaction List - Show all user transactions referenced by email, not id
+
+Implementation Note: Use clean, no override here and there unless necessary, keep it simple and easy to understand, avoid complex logic, use plain english, use minimal breaking changes as possible, do each step carefully, and analyze what the Data class does like UserData, ProductData, OrderData, etc. and how they interact with each other. make sure they dont have circular dependencies.
