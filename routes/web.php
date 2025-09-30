@@ -27,6 +27,10 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
     Route::get('/payments', [PaymentController::class, 'index'])->name('admin.payments');
     Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('admin.payments.verify');
+
+    // Account management (admin only)
+    Route::resource('accounts', AccountController::class);
+    Route::post('/accounts/reorder', [AccountController::class, 'reorder'])->name('admin.accounts.reorder');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -35,7 +39,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('users', UserController::class);
-    Route::resource('accounts', AccountController::class)->except(['index']);
     Route::resource('orders', OrderController::class)->except(['index', 'show']);
     Route::resource('order-items', OrderItemController::class)->except(['index']);
     Route::resource('payments', PaymentController::class)->except(['index']);
@@ -48,7 +51,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
 });
 
-Route::resource('accounts', AccountController::class)->only(['index']);
 Route::resource('orders', OrderController::class)->only(['index']);
 Route::resource('order-items', OrderItemController::class)->only(['index']);
 Route::resource('payments', PaymentController::class)->only(['index']);

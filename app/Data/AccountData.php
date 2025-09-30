@@ -17,6 +17,8 @@ class AccountData extends Data {
         public ?bool $is_active,
         public ?int $sort_order,
         public ?array $metadata,
+        public ?string $created_at,
+        public ?string $updated_at,
         /** @var PaymentData[]|null */
         public ?array $payments = null,
     ) {}
@@ -33,6 +35,8 @@ class AccountData extends Data {
             is_active: $model->is_active,
             sort_order: $model->sort_order,
             metadata: $model->metadata,
+            created_at: $model->created_at?->toISOString(),
+            updated_at: $model->updated_at?->toISOString(),
             payments: $model->relationLoaded('payments') ? $model->payments?->map(fn ($item) => PaymentData::from($item))?->values()?->all() : null,
         );
     }

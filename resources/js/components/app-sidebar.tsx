@@ -1,3 +1,4 @@
+import AccountController from '@/actions/App/Http/Controllers/AccountController';
 import ProductController from '@/actions/App/Http/Controllers/ProductController';
 import UserController from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
@@ -5,11 +6,11 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { orders, payments } from '@/routes/admin';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Box, CreditCard, Folder, LayoutGrid, Package, Users } from 'lucide-react';
+import { BookOpen, Box, CreditCard, Folder, IdCard, LayoutGrid, Package, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-import { orders, payments } from '@/routes/admin';
 
 const mainNavItems: NavItem[] = [
     {
@@ -31,6 +32,11 @@ const mainNavItems: NavItem[] = [
         title: 'Order Management',
         href: orders(),
         icon: Package,
+    },
+    {
+        title: 'Accounts',
+        href: AccountController.index().url,
+        icon: IdCard,
     },
     {
         title: 'Payment Verification',

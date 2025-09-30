@@ -30,11 +30,11 @@ class DatabaseSeeder extends Seeder {
             ]
         );
 
-        Product::factory(50)->create();
-        ProductUnit::factory(5)->create();
-        ProductImage::factory(50)->create();
-        Order::factory(20)->create();
-        OrderItem::factory(50)->create();
-        Account::factory(3)->create();
+        // Product::factory(50)->create();
+        // ProductUnit::factory(5)->create();
+        // ProductImage::factory(50)->create();
+        // Order::factory(20)->create();
+        // OrderItem::factory(50)->create();
+        // Account::factory(3)->create();
     }
 }
