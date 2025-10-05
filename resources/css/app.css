@@ -366,6 +366,63 @@
     }
 }
 
+/* Fresh Agricultural Theme Utilities */
+@layer utilities {
+    .bg-agricultural-gradient {
+        background: linear-gradient(135deg, theme('colors.emerald.50') 0%, theme('colors.teal.50') 50%, theme('colors.green.50') 100%);
+    }
+
+    .dark .bg-agricultural-gradient {
+        background: linear-gradient(135deg, theme('colors.emerald.950') 0%, theme('colors.teal.950') 50%, theme('colors.green.950') 100%);
+    }
+
+    .text-agricultural-gradient {
+        background: linear-gradient(135deg, theme('colors.emerald.600') 0%, theme('colors.teal.600') 50%, theme('colors.green.600') 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .dark .text-agricultural-gradient {
+        background: linear-gradient(135deg, theme('colors.emerald.400') 0%, theme('colors.teal.400') 50%, theme('colors.green.400') 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-agricultural {
+        background: linear-gradient(135deg, theme('colors.emerald.500') 0%, theme('colors.teal.500') 100%);
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .btn-agricultural:hover {
+        background: linear-gradient(135deg, theme('colors.emerald.600') 0%, theme('colors.teal.600') 100%);
+        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+    }
+
+    .card-agricultural {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .dark .card-agricultural {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .card-agricultural:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.2);
+    }
+
+    .dark .card-agricultural:hover {
+        box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.3);
+    }
+}
+
 .ripple {
     position: relative;
     overflow: hidden; /* Ensures the ripple stays within the element */

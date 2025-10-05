@@ -10,7 +10,22 @@ import { useCart } from '@/contexts/CartContext';
 import { cart, checkout, dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ArrowLeft, Banknote, CreditCard, Mail, MapPin, Package, Phone, ShoppingCart, Smartphone, User, Wallet } from 'lucide-react';
+import {
+    ArrowLeft,
+    Banknote,
+    CreditCard,
+    Heart,
+    Mail,
+    MapPin,
+    Package,
+    Phone,
+    Shield,
+    ShoppingCart,
+    Smartphone,
+    Sparkles,
+    User,
+    Wallet,
+} from 'lucide-react';
 import React from 'react';
 import { toast } from 'sonner';
 
@@ -168,43 +183,81 @@ export default function Checkout({ accounts }: CheckoutProps) {
     return (
         <>
             <Head title='Checkout' />
-            <div className='min-h-screen bg-gradient-to-br from-background via-background to-accent/10'>
-                <header className='sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm'>
+            <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950'>
+                {/* Background decoration */}
+                <div className='absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]'></div>
+                <div className='absolute top-0 right-0 left-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20 blur-[100px]'></div>
+
+                <header className='sticky top-0 z-50 border-b bg-white/80 shadow-sm backdrop-blur-lg dark:bg-slate-950/80'>
                     <div className='container mx-auto flex items-center justify-between p-4'>
                         <div className='flex items-center gap-3'>
-                            <Link href={cart()} className='flex items-center gap-2 text-primary hover:text-primary/80'>
+                            <Link
+                                href={cart()}
+                                className='flex items-center gap-2 text-emerald-600 transition-colors duration-300 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300'
+                            >
                                 <ArrowLeft className='h-5 w-5' />
-                                <span className='hidden sm:inline'>Back to cart</span>
+                                <span className='hidden font-medium sm:inline'>Back to cart</span>
                             </Link>
                             <Separator orientation='vertical' className='h-6' />
-                            <CreditCard className='h-8 w-8 text-primary' />
-                            <h1 className='text-2xl font-bold text-primary'>Checkout</h1>
+                            <div className='relative'>
+                                <CreditCard className='h-8 w-8 text-emerald-600 dark:text-emerald-400' />
+                                <div className='absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full bg-emerald-400'></div>
+                            </div>
+                            <div>
+                                <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                                    Secure Checkout
+                                </h1>
+                                <p className='flex items-center gap-1 text-xs text-muted-foreground'>
+                                    <Shield className='h-3 w-3' />
+                                    Protected & Encrypted
+                                </p>
+                            </div>
                         </div>
                         <nav className='flex items-center gap-3'>
-                            <Button asChild variant='ghost' size='icon'>
+                            <Button asChild variant='ghost' size='icon' className='hover:bg-emerald-50 dark:hover:bg-emerald-950'>
                                 <AnimatedThemeToggler />
                             </Button>
-                            <Button asChild variant='ghost' size='icon' className='relative' ripple={false}>
+                            <Button
+                                asChild
+                                variant='ghost'
+                                size='icon'
+                                className='relative hover:bg-emerald-50 dark:hover:bg-emerald-950'
+                                ripple={false}
+                            >
                                 <Link href={cart()}>
                                     <ShoppingCart className='h-5 w-5' />
                                     {getTotalItems() > 0 && (
-                                        <span className='absolute -top-1 -right-1 z-50 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground'>
+                                        <span className='absolute -top-1 -right-1 z-50 flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-xs font-semibold text-white shadow-lg'>
                                             {getTotalItems() > 99 ? '99+' : getTotalItems()}
                                         </span>
                                     )}
                                 </Link>
                             </Button>
                             {auth.user ? (
-                                <Link href={dashboard()} className='btn'>
+                                <Link
+                                    href={dashboard()}
+                                    className='inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-medium text-white shadow-lg ring-offset-background transition-colors hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+                                >
+                                    <Sparkles className='mr-2 h-4 w-4' />
                                     Dashboard
                                 </Link>
                             ) : (
                                 <>
-                                    <Button asChild variant='outline'>
+                                    <Button
+                                        asChild
+                                        variant='outline'
+                                        className='border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950'
+                                    >
                                         <Link href={login()}>Log in</Link>
                                     </Button>
-                                    <Button asChild>
-                                        <Link href={register()}>Register</Link>
+                                    <Button
+                                        asChild
+                                        className='bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl'
+                                    >
+                                        <Link href={register()}>
+                                            <Heart className='mr-2 h-4 w-4' />
+                                            Join Us
+                                        </Link>
                                     </Button>
                                 </>
                             )}
@@ -212,7 +265,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                     </div>
                 </header>
 
-                <main className='container mx-auto p-6'>
+                <main className='relative container mx-auto p-4'>
                     <form onSubmit={handleSubmit}>
                         <div className='grid gap-8 lg:grid-cols-3'>
                             {/* Customer Information */}
