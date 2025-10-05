@@ -1,4 +1,5 @@
 import PaymentController from '@/actions/App/Http/Controllers/PaymentController';
+import { AgriculturalBackground } from '@/components/ui/agricultural-background';
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -144,13 +145,7 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
     return (
         <>
             <Head title='Payment Instructions' />
-            <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950 print:bg-white'>
-                {/* Background decoration */}
-                <div className='absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] print:hidden'></div>
-                <div className='absolute top-0 right-0 left-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20 blur-[100px] print:hidden'></div>
-                {/* Background decoration */}
-                <div className='absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] print:hidden'></div>
-                <div className='absolute top-0 right-0 left-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-20 blur-[100px] print:hidden'></div>
+            <AgriculturalBackground variant='payment' className='print:bg-white'>
                 <header className='sticky top-0 z-50 border-b bg-white/80 shadow-sm backdrop-blur-lg dark:bg-slate-950/80 print:hidden'>
                     <div className='container mx-auto flex items-center justify-between p-4'>
                         <div className='flex items-center gap-3'>
@@ -634,7 +629,7 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                         </div>
                     </div>
                 </main>
-            </div>
+            </AgriculturalBackground>
         </>
     );
 }

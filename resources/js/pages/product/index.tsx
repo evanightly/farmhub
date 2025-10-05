@@ -85,7 +85,7 @@ export default function Index({ items, filters }: Props) {
                 return (
                     <DropdownMenu.DropdownMenu>
                         <DropdownMenu.DropdownMenuTrigger asChild>
-                            <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <Button variant='agricultural-ghost' className='h-8 w-8 p-0'>
                                 <span className='sr-only'>Open menu</span>
                                 <MoreHorizontal className='h-4 w-4' />
                             </Button>
@@ -121,11 +121,13 @@ export default function Index({ items, filters }: Props) {
             <div className='container mx-auto py-8'>
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
-                        <h1 className='text-3xl font-bold tracking-tight'>Products</h1>
-                        <p className='text-muted-foreground'>Manage your products</p>
+                        <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                            Products
+                        </h1>
+                        <p className='text-muted-foreground'>Manage your agricultural products</p>
                     </div>
                     <div className='flex items-center gap-2'>
-                        <Button asChild>
+                        <Button asChild variant='agricultural'>
                             <Link href={ProductController.create().url}>Create Item</Link>
                         </Button>
                     </div>

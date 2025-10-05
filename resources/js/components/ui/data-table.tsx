@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import * as Card from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table-column-header';
 import { DataTableMultiSort } from '@/components/ui/data-table-multi-sort';
@@ -395,14 +395,14 @@ export function DataTable<TData extends Record<string, any>>({
 
     return (
         <div className='container mx-auto space-y-8 py-8'>
-            <Card>
-                <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
+            <Card.Card variant='agricultural-glass'>
+                <Card.CardHeader>
+                    <Card.CardTitle className='flex items-center gap-2'>
                         {title}
                         {pagination && <Badge variant='secondary'>{pagination.total}</Badge>}
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className='space-y-4'>
+                    </Card.CardTitle>
+                </Card.CardHeader>
+                <Card.CardContent className='space-y-4'>
                     {/* Bulk Actions */}
                     {selectedRows.length > 0 && actionBulkButtons.length > 0 && (
                         <div className='flex items-center justify-between gap-4 rounded-md border border-border bg-muted/50 p-3'>
@@ -706,8 +706,8 @@ export function DataTable<TData extends Record<string, any>>({
                             )}
                         </>
                     )}
-                </CardContent>
-            </Card>
+                </Card.CardContent>
+            </Card.Card>
         </div>
     );
 }
