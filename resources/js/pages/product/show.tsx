@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { DragEndEvent } from '@dnd-kit/core';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Edit, GripVertical, Trash2, X as XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -31,6 +31,7 @@ export default function Show({ item }: Props) {
     const [isAddImageOpen, setIsAddImageOpen] = useState(false);
     const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null);
     const [unitTypes, setUnitTypes] = useState(['Kilogram (kg)', 'Karung', 'Ton', 'Pieces', 'Ikat', 'Gram (g)', 'Pack', 'Box']);
+    const [imageFormKey, setImageFormKey] = useState(0); // For resetting file input
 
     // PHP upload limits (in bytes) - using common default values
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB default
@@ -152,6 +153,19 @@ export default function Show({ item }: Props) {
         }
     };
 
+    const resetImageForm = () => {
+        imageForm.reset();
+        imageForm.setData('images', []);
+        imageForm.setData('alt_texts', []);
+        imageForm.setData('is_primary', false);
+        setImageFormKey((prev) => prev + 1);
+    };
+
+    const handleCloseImageDialog = () => {
+        resetImageForm();
+        setIsAddImageOpen(false);
+    };
+
     const handleEditUnit = (unit: (typeof productUnits)[0]) => {
         setEditingUnit(unit);
         editUnitForm.setData({
@@ -202,19 +216,55 @@ export default function Show({ item }: Props) {
             return;
         }
 
-        const formData = new FormData();
-        files.forEach((file, index) => {
-            formData.append(`images[${index}]`, file);
-            formData.append(`alt_texts[${index}]`, imageForm.data.alt_texts[index] || '');
-        });
-        formData.append('is_primary', imageForm.data.is_primary ? '1' : '0');
-        formData.append('product_id', item.id.toString());
-        router.post(ProductImageController.store().url, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            forceFormData: true,
-        });
+        try {
+            const formData = new FormData();
+            files.forEach((file, index) => {
+                formData.append(`images[${index}]`, file);
+                formData.append(`alt_texts[${index}]`, imageForm.data.alt_texts[index] || '');
+            });
+            formData.append('is_primary', imageForm.data.is_primary ? '1' : '0');
+            formData.append('product_id', item.id.toString());
+
+            const response = await axios.post(ProductImageController.store().url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Accept: 'application/json', // Ensure JSON response
+                },
+            });
+
+            // Handle the response - the Laravel controller returns the newly created images
+            if (response.status === 200 || response.status === 201) {
+                const newImages = Array.isArray(response.data) ? response.data : [response.data];
+                // console.log('New images received:', newImages); // Debug log
+
+                // If setting as primary, reorder images to put new primary images first
+                if (imageForm.data.is_primary && newImages.length > 0) {
+                    // Update existing images to not be primary and add new images at the beginning
+                    setProductImages((prev) => [...newImages, ...prev.map((img) => ({ ...img, is_primary: false }))]);
+                } else {
+                    // Add new images to the end, maintaining existing primary status
+                    setProductImages((prev) => [...prev, ...newImages]);
+                }
+
+                // Reset form and close dialog
+                resetImageForm();
+                setIsAddImageOpen(false);
+
+                toast.success(`${newImages.length} gambar berhasil ditambahkan!`);
+            }
+        } catch (error: any) {
+            // console.error('Error adding images:', error);
+
+            if (error.response?.data?.errors) {
+                Object.values(error.response.data.errors)
+                    .flat()
+                    .forEach((errorMsg: any) => {
+                        toast.error(errorMsg);
+                    });
+            } else {
+                toast.error(error.response?.data?.message || 'Gagal menambahkan gambar.');
+            }
+        }
     };
 
     const handleAddUnit = async () => {
@@ -306,7 +356,7 @@ export default function Show({ item }: Props) {
                                         Seret untuk mengubah urutan gambar. Gambar pertama akan menjadi gambar utama.
                                     </Card.CardDescription>
                                 </div>
-                                <Dialog open={isAddImageOpen} onOpenChange={setIsAddImageOpen}>
+                                <Dialog open={isAddImageOpen} onOpenChange={(open) => (open ? setIsAddImageOpen(true) : handleCloseImageDialog())}>
                                     <DialogTrigger asChild>
                                         <Button variant='agricultural'>Tambah Gambar</Button>
                                     </DialogTrigger>
@@ -325,6 +375,7 @@ export default function Show({ item }: Props) {
                                                 <div className='grid gap-2'>
                                                     <Label htmlFor='images'>Gambar (Beberapa berkas diizinkan)</Label>
                                                     <Input
+                                                        key={imageFormKey}
                                                         id='images'
                                                         type='file'
                                                         accept='image/*'
