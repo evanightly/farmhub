@@ -21,13 +21,17 @@ jobs:
             # Navigate to project directory
             cd /var/www/farmhub || { echo "Project directory not found"; exit 1; }
 
+            # Fix git ownership issue
+            echo "🔧 Fixing git ownership..."
+            sudo git config --global --add safe.directory /var/www/farmhub
+
             # Pull latest changes
             echo "🔄 Pulling latest changes from GitHub..."
             git pull origin main
 
             # Install/Update Composer dependencies
             echo "📦 Installing/Updating Composer dependencies..."
-            composer install --no-dev --optimize-autoloader
+            COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
 
             # Install/Update NPM dependencies
             echo "📦 Installing/Updating NPM dependencies..."
@@ -66,16 +70,16 @@ jobs:
 
             # Set proper permissions
             echo "🔒 Setting proper permissions..."
-            sudo chown -R www-data:www-data storage bootstrap/cache
-            sudo chmod -R 775 storage bootstrap/cache
-
-            # Generate TypeScript types (if needed)
-            echo "📝 Generating TypeScript types..."
-            php artisan typescript:transform
+            sudo chown -R www-data:www-data storage bootstrap/cache public/build
+            sudo chmod -R 775 storage bootstrap/cache public/build
 
             # Restart services
-            echo "🔄 Restarting services..."
+            echo "� Restarting services..."
             sudo systemctl reload nginx
+            sudo systemctl restart php8.3-fpm
+
+            # Clear opcache to ensure new code is loaded
+            echo "🧹 Clearing OPcache..."
             sudo systemctl restart php8.3-fpm
 
             # Optional: Restart queue workers if you use them
