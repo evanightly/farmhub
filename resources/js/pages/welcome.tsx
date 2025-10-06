@@ -377,13 +377,13 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
                                         </div>
 
                                         {/* Thumbnail carousel */}
-                                        <div className='flex flex-1'>
-                                            <div className='flex w-full gap-2 overflow-x-scroll rounded-lg bg-slate-100 p-2 dark:bg-slate-800'>
+                                        <div className='flex justify-center'>
+                                            <div className='flex flex-wrap gap-2 rounded-lg bg-slate-100 p-2 dark:bg-slate-800'>
                                                 {product.product_images.map((img, index) => (
                                                     <button
                                                         key={img.id}
                                                         onClick={() => setDialogCurrentImageIndex(index)}
-                                                        className={`aspect-square rounded-lg border-2 transition-all duration-200 ${
+                                                        className={`size-16 rounded-lg border-2 transition-all duration-200 ${
                                                             index === dialogCurrentImageIndex
                                                                 ? 'border-emerald-500 ring-2 ring-emerald-200 dark:ring-emerald-800'
                                                                 : 'border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500'
