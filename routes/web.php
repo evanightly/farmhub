@@ -24,6 +24,7 @@ Route::post('/orders/{order}/upload-proof-qr', [PaymentController::class, 'uploa
 // Admin routes
 Route::middleware(['auth', 'role:admin,employee'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [OrderController::class, 'adminDashboard'])->name('admin.dashboard');
+    Route::get('/dashboard/chart-data', [OrderController::class, 'getChartData'])->name('admin.dashboard.chart-data');
     Route::get('/orders', [OrderController::class, 'adminOrders'])->name('admin.orders');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
     Route::get('/payments', [PaymentController::class, 'index'])->name('admin.payments');

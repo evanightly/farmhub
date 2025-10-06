@@ -15,7 +15,7 @@ import AppLogo from './app-logo';
 const adminNavItems: NavItem[] = [
     {
         title: 'Dasbor',
-        href: dashboard(),
+        href: OrderController.adminDashboard().url,
         icon: LayoutGrid,
     },
     {

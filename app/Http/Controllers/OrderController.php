@@ -197,6 +197,111 @@ class OrderController extends Controller {
         ]);
     }
 
+    public function getChartData(Request $request) {
+        // Ensure only admin or employee can access
+        if (!Auth::check() || (Auth::user()?->role !== 'admin' && Auth::user()?->role !== 'employee')) {
+            abort(403, 'Admin or employee access required.');
+        }
+
+        $dateFrom = $request->input('date_from', now()->subDays(30)->format('Y-m-d'));
+        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+
+        // Daily orders and revenue data
+        $dailyData = Order::whereBetween('created_at', [$dateFrom, $dateTo])
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as orders, SUM(CASE WHEN payment_status = "verified" THEN total_amount ELSE 0 END) as revenue')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'orders' => (int) $item->orders,
+                    'revenue' => (float) $item->revenue,
+                ];
+            });
+
+        // Order status distribution
+        $statusData = Order::whereBetween('created_at', [$dateFrom, $dateTo])
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->map(function ($item) {
+                $statusLabels = [
+                    'pending' => 'Menunggu',
+                    'confirmed' => 'Dikonfirmasi',
+                    'shipped' => 'Dikirim',
+                    'delivered' => 'Diterima',
+                    'cancelled' => 'Dibatalkan',
+                ];
+
+                return [
+                    'status' => $statusLabels[$item->status] ?? $item->status,
+                    'count' => (int) $item->count,
+                    'fill' => $this->getStatusColor($item->status),
+                ];
+            });
+
+        // Top products
+        $topProducts = Order::whereBetween('orders.created_at', [$dateFrom, $dateTo])
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->selectRaw('products.name, SUM(order_items.quantity) as total_quantity')
+            ->groupBy('products.id', 'products.name')
+            ->orderBy('total_quantity', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->name,
+                    'quantity' => (int) $item->total_quantity,
+                ];
+            });
+
+        // Monthly comparison (current period vs previous period)
+        $periodDays = now()->parse($dateTo)->diffInDays(now()->parse($dateFrom)) + 1;
+        $previousDateFrom = now()->parse($dateFrom)->subDays($periodDays)->format('Y-m-d');
+        $previousDateTo = now()->parse($dateFrom)->subDay()->format('Y-m-d');
+
+        $currentStats = [
+            'orders' => Order::whereBetween('created_at', [$dateFrom, $dateTo])->count(),
+            'revenue' => Order::whereBetween('created_at', [$dateFrom, $dateTo])
+                ->where('payment_status', 'verified')->sum('total_amount'),
+        ];
+
+        $previousStats = [
+            'orders' => Order::whereBetween('created_at', [$previousDateFrom, $previousDateTo])->count(),
+            'revenue' => Order::whereBetween('created_at', [$previousDateFrom, $previousDateTo])
+                ->where('payment_status', 'verified')->sum('total_amount'),
+        ];
+
+        return response()->json([
+            'daily_data' => $dailyData,
+            'status_data' => $statusData,
+            'top_products' => $topProducts,
+            'comparison' => [
+                'current' => $currentStats,
+                'previous' => $previousStats,
+                'orders_change' => $previousStats['orders'] > 0
+                    ? round((($currentStats['orders'] - $previousStats['orders']) / $previousStats['orders']) * 100, 2)
+                    : 0,
+                'revenue_change' => $previousStats['revenue'] > 0
+                    ? round((($currentStats['revenue'] - $previousStats['revenue']) / $previousStats['revenue']) * 100, 2)
+                    : 0,
+            ],
+        ]);
+    }
+
+    private function getStatusColor($status) {
+        return match ($status) {
+            'pending' => '#f59e0b',     // amber-500
+            'confirmed' => '#3b82f6',   // blue-500
+            'shipped' => '#8b5cf6',     // violet-500
+            'delivered' => '#10b981',   // emerald-500
+            'cancelled' => '#ef4444',   // red-500
+            default => '#6b7280',       // gray-500
+        };
+    }
+
     public function adminOrders(Request $request) {
         // Ensure only admin or employee can access
         if (!Auth::check() || (Auth::user()?->role !== 'admin' && Auth::user()?->role !== 'employee')) {
