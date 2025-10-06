@@ -116,8 +116,8 @@ export function AppSidebar() {
     const navItems = getNavItems();
 
     return (
-        <Sidebar collapsible='icon' variant='inset'>
-            <SidebarHeader className='rounded-t-lg bg-gradient-to-b from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/50 dark:to-teal-950/50'>
+        <Sidebar collapsible='icon'>
+            <SidebarHeader className='bg-gradient-to-b from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/50 dark:to-teal-950/50'>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size='lg' asChild className='hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50'>
@@ -133,7 +133,7 @@ export function AppSidebar() {
                 <NavMain items={navItems} />
             </SidebarContent>
 
-            <SidebarFooter className='rounded-b-lg border-t border-emerald-200/50 bg-gradient-to-b from-teal-50/50 to-emerald-50/50 dark:border-emerald-800/50 dark:from-teal-950/50 dark:to-emerald-950/50'>
+            <SidebarFooter className='border-emerald-200/50 bg-gradient-to-b from-teal-50/50 to-emerald-50/50 dark:border-emerald-800/50 dark:from-teal-950/50 dark:to-emerald-950/50'>
                 <NavFooter items={footerNavItems} className='mt-auto' />
                 <NavUser />
             </SidebarFooter>
