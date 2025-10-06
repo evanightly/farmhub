@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\ProductUnitController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -21,7 +22,7 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.sh
 Route::post('/orders/{order}/upload-proof-qr', [PaymentController::class, 'uploadProofWithToken'])->name('payment.upload-proof-qr');
 
 // Admin routes
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin,employee'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [OrderController::class, 'adminDashboard'])->name('admin.dashboard');
     Route::get('/orders', [OrderController::class, 'adminOrders'])->name('admin.orders');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
@@ -29,26 +30,43 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('admin.payments.verify');
 
     // Account management (admin only)
-    Route::resource('accounts', AccountController::class);
-    Route::post('/accounts/reorder', [AccountController::class, 'reorder'])->name('admin.accounts.reorder');
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('accounts', AccountController::class);
+        Route::post('/accounts/reorder', [AccountController::class, 'reorder'])->name('admin.accounts.reorder');
+    });
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return redirect()->route('admin.dashboard');
+        $user = Auth::user();
+
+        // Redirect based on user role
+        if ($user && ($user->role === 'admin' || $user->role === 'employee')) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // Regular customers go to transactions
+        return redirect()->route('transactions');
     })->name('dashboard');
 
-    Route::resource('users', UserController::class);
-    Route::resource('orders', OrderController::class)->except(['index', 'show']);
-    Route::resource('order-items', OrderItemController::class)->except(['index']);
-    Route::resource('payments', PaymentController::class)->except(['index']);
-    Route::resource('products', ProductController::class)->except(['index']);
-    Route::resource('product-images', ProductImageController::class)->except(['index']);
-    Route::resource('product-units', ProductUnitController::class)->except(['index']);
+    // Admin-only routes
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('products', ProductController::class)->except(['index']);
+        Route::resource('product-images', ProductImageController::class)->except(['index']);
+        Route::resource('product-units', ProductUnitController::class)->except(['index']);
 
-    // Product units and images reordering
-    Route::post('products/{product}/units/reorder', [ProductUnitController::class, 'reorder'])->name('products.units.reorder');
-    Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+        // Product units and images reordering
+        Route::post('products/{product}/units/reorder', [ProductUnitController::class, 'reorder'])->name('products.units.reorder');
+        Route::post('products/{product}/images/reorder', [ProductImageController::class, 'reorder'])->name('products.images.reorder');
+    });
+
+    // Admin and Employee routes
+    Route::middleware(['role:admin,employee'])->group(function () {
+        Route::resource('orders', OrderController::class)->except(['index', 'show']);
+        Route::resource('order-items', OrderItemController::class)->except(['index']);
+        Route::resource('payments', PaymentController::class)->except(['index']);
+    });
 });
 
 Route::resource('orders', OrderController::class)->only(['index']);

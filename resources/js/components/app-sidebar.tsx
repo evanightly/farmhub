@@ -6,14 +6,14 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
 import { orders, payments } from '@/routes/admin';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Box, CreditCard, Folder, IdCard, LayoutGrid, Package, Receipt, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
+const adminNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
@@ -51,6 +51,37 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
+const employeeNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Order Management',
+        href: orders(),
+        icon: Package,
+    },
+    {
+        title: 'Payment Verification',
+        href: payments(),
+        icon: CreditCard,
+    },
+    {
+        title: 'Transactions',
+        href: OrderController.transactions().url,
+        icon: Receipt,
+    },
+];
+
+const customerNavItems: NavItem[] = [
+    {
+        title: 'Transactions',
+        href: OrderController.transactions().url,
+        icon: Receipt,
+    },
+];
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -65,13 +96,32 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+
+    // Determine which navigation items to show based on user role
+    const getNavItems = (): NavItem[] => {
+        if (!auth.user) return customerNavItems;
+
+        switch (auth.user.role) {
+            case 'admin':
+                return adminNavItems;
+            case 'employee':
+                return employeeNavItems;
+            case 'customer':
+            default:
+                return customerNavItems;
+        }
+    };
+
+    const navItems = getNavItems();
+
     return (
         <Sidebar collapsible='icon' variant='inset'>
             <SidebarHeader className='rounded-t-lg bg-gradient-to-b from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/50 dark:to-teal-950/50'>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size='lg' asChild className='hover:bg-emerald-100/50 dark:hover:bg-emerald-900/50'>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={home()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
@@ -80,7 +130,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className='bg-gradient-to-b from-emerald-50/30 to-teal-50/30 dark:from-emerald-950/30 dark:to-teal-950/30'>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter className='rounded-b-lg border-t border-emerald-200/50 bg-gradient-to-b from-teal-50/50 to-emerald-50/50 dark:border-emerald-800/50 dark:from-teal-950/50 dark:to-emerald-950/50'>
