@@ -44,6 +44,7 @@ export default function Edit({ item }: Props) {
             const formData = new FormData(e.currentTarget);
             router.put(ProductController.update(item.id).url, formData);
         } catch (error) {
+            console.error('Error updating product:', error);
         } finally {
             setLoading(false);
         }

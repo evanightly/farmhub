@@ -116,7 +116,7 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
                     </div>
                 );
 
-            case 'numberrange':
+            case 'numberrange': {
                 const rangeValue = Array.isArray(value) ? value : [filter.min || 0, filter.max || 100];
                 return (
                     <div className={cn('w-80 p-4', className)}>
@@ -137,6 +137,7 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
                         </div>
                     </div>
                 );
+            }
 
             case 'boolean':
                 return (
@@ -202,7 +203,7 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
                     </div>
                 );
 
-            case 'daterange':
+            case 'daterange': {
                 const dateRange = Array.isArray(value) ? value : [null, null];
                 const fromDate = dateRange[0] ? new Date(dateRange[0]) : undefined;
                 const toDate = dateRange[1] ? new Date(dateRange[1]) : undefined;
@@ -224,13 +225,15 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
                         />
                     </div>
                 );
+            }
 
-            case 'custom':
+            case 'custom': {
                 if (filter.component) {
                     const CustomComponent = filter.component;
                     return <CustomComponent column={column} value={value} onChange={onChange} onClear={onClear} />;
                 }
                 return null;
+            }
 
             default:
                 return null;
@@ -241,18 +244,21 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
         if (!hasValue) return null;
 
         switch (filter.type) {
-            case 'multiselect':
+            case 'multiselect': {
                 const selectedOptions = filter.options?.filter((opt) => Array.isArray(value) && value.includes(opt.value)) || [];
                 return selectedOptions.length > 0 ? `${selectedOptions.length} selected` : null;
+            }
 
-            case 'select':
+            case 'select': {
                 const selectedOption = filter.options?.find((opt) => opt.value === value);
                 return selectedOption?.label || value;
+            }
 
-            case 'numberrange':
+            case 'numberrange': {
                 return Array.isArray(value) ? `${value[0]} - ${value[1]}` : null;
+            }
 
-            case 'daterange':
+            case 'daterange': {
                 if (Array.isArray(value) && value[0]) {
                     const fromDate = new Date(value[0]);
                     const toDate = value[1] ? new Date(value[1]) : null;
@@ -271,6 +277,7 @@ export function ColumnFilterComponent({ column, filter, value, onChange, onClear
                     return `From ${fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
                 }
                 return null;
+            }
 
             case 'boolean':
                 return value ? 'Yes' : 'No';

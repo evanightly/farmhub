@@ -10,19 +10,12 @@ export default [
     js.configs.recommended,
     ...typescript.configs.recommended,
     {
-        plugins: {
-            '@typescript-eslint': typescript,
-        },
         rules: {
-            ...typescript.configs.recommended.rules,
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/ban-ts-comment': 'off',
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/no-non-null-assertion': 'off',
-            '@typescript-eslint/no-unused-vars': [
-                'warn',
-                { argsIgnorePattern: '^_' },
-            ],
+            '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         },
     },
     {
@@ -54,13 +47,7 @@ export default [
         },
     },
     {
-        ignores: [
-            'vendor',
-            'node_modules',
-            'public',
-            'bootstrap/ssr',
-            'tailwind.config.js',
-        ],
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];
