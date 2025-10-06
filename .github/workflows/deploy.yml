@@ -1,0 +1,103 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: |
+            # Navigate to project directory
+            cd /var/www/farmhub || { echo "Project directory not found"; exit 1; }
+
+            # Pull latest changes
+            echo "🔄 Pulling latest changes from GitHub..."
+            git pull origin main
+
+            # Install/Update Composer dependencies
+            echo "📦 Installing/Updating Composer dependencies..."
+            composer install --no-dev --optimize-autoloader
+
+            # Install/Update NPM dependencies
+            echo "📦 Installing/Updating NPM dependencies..."
+            npm ci
+
+            # Create production .env file from secret
+            echo "⚙️ Setting up production environment..."
+            echo '${{ secrets.PRODUCTION_ENV }}' > .env
+
+            # Generate application key if not exists
+            if ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then
+              echo "🔑 Generating application key..."
+              php artisan key:generate --force
+            fi
+
+            # Clear and cache config
+            echo "🧹 Clearing caches..."
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan view:clear
+            php artisan route:clear
+
+            # Run database migrations
+            echo "🗄️ Running database migrations..."
+            php artisan migrate --force
+
+            # Cache config and routes for production
+            echo "⚡ Optimizing for production..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Build frontend assets
+            echo "🏗️ Building frontend assets..."
+            npm run build
+
+            # Set proper permissions
+            echo "🔒 Setting proper permissions..."
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
+
+            # Generate TypeScript types (if needed)
+            echo "📝 Generating TypeScript types..."
+            php artisan typescript:transform
+
+            # Restart services
+            echo "🔄 Restarting services..."
+            sudo systemctl reload nginx
+            sudo systemctl restart php8.3-fpm
+
+            # Optional: Restart queue workers if you use them
+            # sudo supervisorctl restart laravel-worker:*
+
+            echo "✅ Deployment completed successfully!"
+            echo "🌐 Application is now live!"
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Notify deployment status
+        if: success()
+        run: |
+          echo "🎉 Deployment to VPS completed successfully!"
+          echo "✅ E-Catalog Pertanian is now updated and running"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "🔍 Please check the logs and try again"
