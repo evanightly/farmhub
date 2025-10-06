@@ -25,7 +25,8 @@ class StoreProductImageRequest extends FormRequest {
             'images' => ['required', 'array'],
             'images.*' => ['required', 'image', 'max:10240'], // 10MB max
             'is_primary' => ['boolean'],
-            'alt_text' => ['nullable', 'string', 'max:255'],
+            'alt_texts' => ['array'],
+            'alt_texts.*' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

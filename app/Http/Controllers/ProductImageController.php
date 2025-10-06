@@ -41,7 +41,7 @@ class ProductImageController extends Controller {
 
             return $product->product_images()->create([
                 'image_path' => $path,
-                'alt_text' => $validated['alt_text'] ?? $product->name,
+                'alt_text' => $validated['alt_texts'][$index] ?? null,
                 'is_primary' => ($validated['is_primary'] ?? false) && $index === 0, // Only first image can be primary if requested
                 'sort_order' => $product->product_images()->count() + $index + 1,
             ]);
@@ -53,7 +53,12 @@ class ProductImageController extends Controller {
         session()->flash('success', 'Images uploaded successfully');
 
         // Always return transformed data
-        return response()->json($images->map(fn ($image) => ProductImageData::from($image)));
+        /** @var Request $request */
+        if ($request->wantsJson()) {
+            return response()->json($images->map(fn ($image) => ProductImageData::from($image)));
+        }
+
+        return redirect()->back();
     }
 
     /**
@@ -74,7 +79,15 @@ class ProductImageController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(UpdateProductImageRequest $request, ProductImage $productImage) {
-        //
+        $productImage->update($request->validated());
+        session()->flash('success', 'Product image updated successfully');
+
+        /** @var Request $request */
+        if ($request->wantsJson()) {
+            return response()->json(ProductImageData::from($productImage->refresh()));
+        }
+
+        return redirect()->route('products.index');
     }
 
     /**

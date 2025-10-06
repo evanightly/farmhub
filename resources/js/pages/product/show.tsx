@@ -1,10 +1,11 @@
 import ProductImageController from '@/actions/App/Http/Controllers/ProductImageController';
 import ProductUnitController from '@/actions/App/Http/Controllers/ProductUnitController';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import * as Card from '@/components/ui/card';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Combobox } from '@/components/ui/combobox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item';
 import { Label } from '@/components/ui/label';
 import * as Sortable from '@/components/ui/sortable';
 import { Switch } from '@/components/ui/switch';
@@ -15,6 +16,7 @@ import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Edit, GripVertical, Trash2, X as XIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
     item: App.Data.Product.Show.ProductData;
@@ -27,6 +29,32 @@ export default function Show({ item }: Props) {
     const [isEditUnitOpen, setIsEditUnitOpen] = useState(false);
     const [editingUnit, setEditingUnit] = useState<(typeof productUnits)[0] | null>(null);
     const [isAddImageOpen, setIsAddImageOpen] = useState(false);
+    const [editingImageIndex, setEditingImageIndex] = useState<number | null>(null);
+    const [unitTypes, setUnitTypes] = useState(['Kilogram (kg)', 'Karung', 'Ton', 'Pieces', 'Ikat', 'Gram (g)', 'Pack', 'Box']);
+
+    // PHP upload limits (in bytes) - using common default values
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB default
+    const MAX_TOTAL_SIZE = 8 * 1024 * 1024; // 8MB total
+
+    const validateFileSize = (files: File[]) => {
+        const errors: string[] = [];
+        let totalSize = 0;
+
+        files.forEach((file, index) => {
+            if (file.size > MAX_FILE_SIZE) {
+                errors.push(`File ${index + 1} (${file.name}) is too large. Maximum size is ${(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB.`);
+            }
+            totalSize += file.size;
+        });
+
+        if (totalSize > MAX_TOTAL_SIZE) {
+            errors.push(
+                `Total file size (${(totalSize / 1024 / 1024).toFixed(1)}MB) exceeds maximum limit of ${(MAX_TOTAL_SIZE / 1024 / 1024).toFixed(1)}MB.`,
+            );
+        }
+
+        return errors;
+    };
 
     const unitForm = useForm({
         unit_type: '',
@@ -50,93 +78,75 @@ export default function Show({ item }: Props) {
         product_id: item.id,
     });
 
-    const handleUnitOrder = async (event: DragEndEvent & { activeIndex: number; overIndex: number }) => {
-        const oldIndex = event.activeIndex;
-        const newIndex = event.overIndex;
-
-        const updatedUnits = [...productUnits];
-        const [movedUnit] = updatedUnits.splice(oldIndex, 1);
-        updatedUnits.splice(newIndex, 0, movedUnit);
-        // Update sort_order based on new array positions
-        const updatedWithOrder = updatedUnits.map((unit, index) => ({
-            ...unit,
-            sort_order: index + 1,
-        }));
-
-        try {
-            if (!item.id) return;
-
-            await axios.post(ProductUnitController.reorder(item.id).url, {
-                units: updatedWithOrder.map(({ id, sort_order }) => ({ id, sort_order })),
-            });
-            // Only update state after successful API call
-            setProductUnits(updatedWithOrder);
-        } catch (error) {
-            console.error('Failed to update unit order:', error);
-            // Keep original order on error
-            setProductUnits(productUnits);
-        }
-    };
-
-    const handleImageOrder = async (event: DragEndEvent & { activeIndex: number; overIndex: number }) => {
-        const oldIndex = event.activeIndex;
-        const newIndex = event.overIndex;
-
-        const updatedImages = [...productImages];
-        const [movedImage] = updatedImages.splice(oldIndex, 1);
-        updatedImages.splice(newIndex, 0, movedImage);
-
-        // Update sort_order based on new array positions
-        const updatedWithOrder = updatedImages.map((image, index) => ({
-            ...image,
-            sort_order: index + 1,
-        }));
-
-        try {
-            if (!item.id) return;
-            await axios.post(ProductImageController.reorder(item.id).url, {
-                images: updatedWithOrder.map(({ id, sort_order }) => ({ id, sort_order })),
-            });
-            // Only update state after successful API call
-            setProductImages(updatedWithOrder);
-        } catch (error) {
-            console.error('Failed to update image order:', error);
-            // Keep original order on error
-            setProductImages(productImages);
-        }
-    };
-
     const imageForm = useForm({
         images: [] as File[],
+        alt_texts: [] as string[],
         is_primary: false,
         product_id: item.id,
     });
 
-    const handleAddUnit = async () => {
-        try {
-            const response = await axios.post(ProductUnitController.store().url, {
-                ...unitForm.data,
-                product_id: item.id,
-            });
+    const handleUnitOrder = async (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
 
-            setProductUnits((prev) => [...prev, response.data].sort((a, b) => a.sort_order - b.sort_order));
-            setIsAddUnitOpen(false);
-            unitForm.reset();
-        } catch (error) {
-            console.error('Failed to add unit:', error);
+        const oldIndex = productUnits.findIndex((unit) => unit.id === active.id);
+        const newIndex = productUnits.findIndex((unit) => unit.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+            const reorderedUnits = [...productUnits];
+            const [movedUnit] = reorderedUnits.splice(oldIndex, 1);
+            reorderedUnits.splice(newIndex, 0, movedUnit);
+
+            setProductUnits(reorderedUnits);
+
+            // Update sort_order for affected units
+            try {
+                const updatePromises = reorderedUnits.map((unit, index) =>
+                    axios.put(ProductUnitController.update({ product_unit: unit.id }).url, {
+                        ...unit,
+                        sort_order: index + 1,
+                    }),
+                );
+                await Promise.all(updatePromises);
+            } catch (error: any) {
+                console.error('Error updating unit order:', error);
+                toast.error('Failed to save unit order.');
+                // Revert the change on error
+                setProductUnits(productUnits);
+            }
         }
     };
 
-    const handleDeleteUnit = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this unit?')) {
-            return;
-        }
+    const handleImageOrder = async (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
 
-        try {
-            await axios.delete(ProductUnitController.destroy(id).url);
-            setProductUnits((prev) => prev.filter((unit) => unit.id !== id));
-        } catch (error) {
-            console.error('Failed to delete unit:', error);
+        const oldIndex = productImages.findIndex((image) => image.id === active.id);
+        const newIndex = productImages.findIndex((image) => image.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+            const reorderedImages = [...productImages];
+            const [movedImage] = reorderedImages.splice(oldIndex, 1);
+            reorderedImages.splice(newIndex, 0, movedImage);
+
+            setProductImages(reorderedImages);
+
+            // Update sort_order and is_primary for affected images
+            try {
+                const updatePromises = reorderedImages.map((image, index) =>
+                    axios.put(ProductImageController.update(image.id).url, {
+                        ...image,
+                        sort_order: index + 1,
+                        is_primary: index === 0, // Set first image as primary
+                    }),
+                );
+                await Promise.all(updatePromises);
+            } catch (error: any) {
+                console.error('Error updating image order:', error);
+                toast.error('Failed to save image order.');
+                // Revert the change on error
+                setProductImages(productImages);
+            }
         }
     };
 
@@ -155,49 +165,124 @@ export default function Show({ item }: Props) {
         setIsEditUnitOpen(true);
     };
 
-    const handleUpdateUnit = async () => {
-        if (!editingUnit) return;
-
+    const handleDeleteUnit = async (unitId: number) => {
         try {
-            const response = await axios.put(ProductUnitController.update(editingUnit.id).url, editUnitForm.data);
-
-            setProductUnits((prev) =>
-                prev.map((unit) => (unit.id === editingUnit.id ? response.data : unit)).sort((a, b) => a.sort_order - b.sort_order),
-            );
-            setIsEditUnitOpen(false);
-            setEditingUnit(null);
-            editUnitForm.reset();
-        } catch (error) {
-            console.error('Failed to update unit:', error);
+            await axios.delete(ProductUnitController.destroy({ product_unit: unitId }).url);
+            setProductUnits(productUnits.filter((unit) => unit.id !== unitId));
+            toast.success('Unit deleted successfully!');
+        } catch (error: any) {
+            console.error('Error deleting unit:', error);
+            toast.error('Failed to delete unit.');
         }
     };
 
-    const handleDeleteImage = async (id: number) => {
+    const handleDeleteImage = async (imageId: number) => {
         try {
-            await axios.delete(ProductImageController.destroy(id).url);
-            setProductImages((prev) => prev.filter((image) => image.id !== id));
-        } catch (error) {
-            console.error('Failed to delete image:', error);
+            await axios.delete(ProductImageController.destroy({ product_image: imageId }).url);
+            setProductImages(productImages.filter((image) => image.id !== imageId));
+            toast.success('Image deleted successfully!');
+        } catch (error: any) {
+            console.error('Error deleting image:', error);
+            toast.error('Failed to delete image.');
         }
     };
 
     const handleAddImage = async () => {
-        try {
-            const formData = new FormData();
-            imageForm.data.images.forEach((file) => {
-                formData.append('images[]', file);
+        const files = imageForm.data.images;
+        if (files.length === 0) {
+            toast.error('Please select at least one image.');
+            return;
+        }
+
+        const validationErrors = validateFileSize(files);
+        if (validationErrors.length > 0) {
+            validationErrors.forEach((error) => toast.error(error));
+            return;
+        }
+
+        const formData = new FormData();
+        files.forEach((file, index) => {
+            formData.append(`images[${index}]`, file);
+            formData.append(`alt_texts[${index}]`, imageForm.data.alt_texts[index] || '');
+        });
+        formData.append('is_primary', imageForm.data.is_primary ? '1' : '0');
+        formData.append('product_id', item.id.toString());
+        axios
+            .post(ProductImageController.store().url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            .finally(() => {
+                location.reload(); //bad fix
             });
-            formData.append('is_primary', imageForm.data.is_primary ? '1' : '0');
-            formData.append('product_id', String(item.id));
+    };
 
-            const response = await axios.post(ProductImageController.store().url, formData);
+    const handleAddUnit = async () => {
+        try {
+            const response = await axios.post(ProductUnitController.store().url, unitForm.data);
+            console.log(response);
 
-            // Update state with new images
-            setProductImages((prev) => [...prev, ...response.data].sort((a, b) => a.sort_order - b.sort_order));
-            setIsAddImageOpen(false);
-            imageForm.reset();
-        } catch (error) {
-            console.error('Failed to add images:', error);
+            if (response.status === 200) {
+                setProductUnits([...productUnits, response.data]);
+                unitForm.reset();
+                setIsAddUnitOpen(false);
+                toast.success('Unit added successfully!');
+            }
+        } catch (error: any) {
+            console.error('Error adding unit:', error);
+            if (error.response?.data?.errors) {
+                Object.values(error.response.data.errors)
+                    .flat()
+                    .forEach((errorMsg: any) => {
+                        toast.error(errorMsg);
+                    });
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to add unit.');
+            }
+        }
+    };
+
+    const handleUpdateUnit = async () => {
+        if (!editingUnit) return;
+
+        try {
+            const response = await axios.put(ProductUnitController.update({ product_unit: editingUnit.id }).url, editUnitForm.data);
+            if (response.status === 200) {
+                setProductUnits(productUnits.map((unit) => (unit.id === editingUnit.id ? response.data : unit)));
+                editUnitForm.reset();
+                setIsEditUnitOpen(false);
+                setEditingUnit(null);
+                toast.success('Unit updated successfully!');
+            }
+        } catch (error: any) {
+            console.error('Error updating unit:', error);
+            if (error.response?.data?.errors) {
+                Object.values(error.response.data.errors)
+                    .flat()
+                    .forEach((errorMsg: any) => {
+                        toast.error(errorMsg);
+                    });
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to update unit.');
+            }
+        }
+    };
+
+    const handleUpdateImageAltText = async () => {
+        if (editingImageIndex === null || !productImages[editingImageIndex]) return;
+
+        const image = productImages[editingImageIndex];
+
+        try {
+            await axios.put(ProductImageController.update(image.id).url, {
+                alt_text: image.alt_text || '',
+            });
+            toast.success('Image alt text updated successfully!');
+            setEditingImageIndex(null);
+        } catch (error: any) {
+            console.error('Error updating image:', error);
+            toast.error(error.response?.data?.message || 'Failed to update image alt text.');
         }
     };
 
@@ -206,15 +291,14 @@ export default function Show({ item }: Props) {
             <Head title={`Product: ${item.name}`} />
 
             <div className='container mx-auto py-8'>
-                {/* Header Section */}
                 <div className='mb-8'>
                     <h1 className='text-3xl font-bold tracking-tight'>{item.name}</h1>
-                    <p className='text-muted-foreground'>{item.description}</p>
+                    <p className='mt-2 text-muted-foreground'>{item.description}</p>
                 </div>
 
-                <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
+                <main className='flex flex-1 flex-col gap-8 space-y-8 lg:flex-row'>
                     {/* Product Images Section */}
-                    <Card.Card variant='agricultural-glass'>
+                    <Card.Card variant='agricultural-glass' className='flex-1'>
                         <Card.CardHeader>
                             <div className='flex items-center justify-between'>
                                 <div>
@@ -238,24 +322,70 @@ export default function Show({ item }: Props) {
                                         >
                                             <div className='grid gap-4 py-4'>
                                                 <div className='grid gap-2'>
-                                                    <Label htmlFor='images'>Images</Label>
+                                                    <Label htmlFor='images'>Images (Multiple files allowed)</Label>
                                                     <Input
                                                         id='images'
                                                         type='file'
                                                         accept='image/*'
+                                                        multiple
                                                         onChange={(e) => {
                                                             const files = Array.from(e.target.files || []);
                                                             imageForm.setData('images', files);
+                                                            // Initialize alt_texts array with empty strings
+                                                            imageForm.setData('alt_texts', new Array(files.length).fill(''));
                                                         }}
                                                     />
+                                                    <p className='text-xs text-muted-foreground'>
+                                                        Maximum {(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB per file,{' '}
+                                                        {(MAX_TOTAL_SIZE / 1024 / 1024).toFixed(1)}MB total
+                                                    </p>
                                                 </div>
+
+                                                {/* Alt text inputs for each selected image with preview */}
+                                                {imageForm.data.images.map((file, index) => (
+                                                    <div key={`${file.name}-${index}`} className='grid gap-2 rounded-lg border p-4'>
+                                                        <div className='flex items-start gap-4'>
+                                                            {/* Image Preview */}
+                                                            <div className='relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted'>
+                                                                <img
+                                                                    src={URL.createObjectURL(file)}
+                                                                    alt={`Preview ${index + 1}`}
+                                                                    className='h-full w-full object-cover'
+                                                                />
+                                                            </div>
+                                                            {/* Alt text input */}
+                                                            <div className='flex-1 space-y-2'>
+                                                                <Label
+                                                                    className='line-clamp-2 text-sm font-medium break-all'
+                                                                    htmlFor={`alt_text_${index}`}
+                                                                >
+                                                                    Alt text for "{file.name}"
+                                                                </Label>
+                                                                <Input
+                                                                    id={`alt_text_${index}`}
+                                                                    placeholder='Describe this image for accessibility'
+                                                                    value={imageForm.data.alt_texts[index] || ''}
+                                                                    onChange={(e) => {
+                                                                        const newAltTexts = [...imageForm.data.alt_texts];
+                                                                        newAltTexts[index] = e.target.value;
+                                                                        imageForm.setData('alt_texts', newAltTexts);
+                                                                    }}
+                                                                />
+                                                                <p className='text-xs text-muted-foreground'>
+                                                                    Size: {(file.size / 1024 / 1024).toFixed(2)}MB
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
                                                 <div className='flex items-center gap-2'>
                                                     <Switch
                                                         id='is_primary'
                                                         checked={imageForm.data.is_primary}
                                                         onCheckedChange={(checked) => imageForm.setData('is_primary', checked)}
                                                     />
-                                                    <Label htmlFor='is_primary'>Set as primary image</Label>
+                                                    <Label htmlFor='is_primary'>Set first image as primary</Label>
                                                 </div>
                                             </div>
                                             <DialogFooter>
@@ -276,27 +406,42 @@ export default function Show({ item }: Props) {
                                 orientation='mixed'
                                 getItemValue={(item) => item.id}
                             >
-                                <Sortable.Content className='grid grid-cols-2 gap-4 md:grid-cols-3'>
+                                <Sortable.Content className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
                                     {productImages.map((image) => (
                                         <Sortable.Item key={image.id} value={image.id} className='group relative'>
-                                            <div className='relative aspect-square overflow-hidden rounded-lg border bg-muted'>
+                                            <div className='relative h-52 w-full overflow-hidden rounded-lg border bg-muted'>
                                                 <img src={image.url} alt={image.alt_text} className='h-full w-full object-cover' />
 
                                                 {/* Drag Handle */}
-                                                <Sortable.ItemHandle className='absolute top-2 left-2 flex h-6 w-6 cursor-grab items-center justify-center rounded bg-black/50 opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 hover:bg-black/70 active:cursor-grabbing'>
-                                                    <GripVertical className='h-3 w-3 text-white' />
+                                                <Sortable.ItemHandle
+                                                    className={buttonVariants({
+                                                        size: 'icon',
+                                                        className:
+                                                            'absolute top-2 left-2 flex cursor-grab bg-black/50 opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 hover:bg-black/70 active:cursor-grabbing',
+                                                    })}
+                                                >
+                                                    <GripVertical />
                                                 </Sortable.ItemHandle>
 
-                                                {/* Delete Button */}
-                                                <Button
-                                                    ripple={false}
-                                                    variant='destructive'
-                                                    size='icon'
-                                                    className='absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100'
-                                                    onClick={() => handleDeleteImage(image.id)}
-                                                >
-                                                    <XIcon className='h-3 w-3' />
-                                                </Button>
+                                                {/* Action Buttons */}
+                                                <div className='absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+                                                    <Button
+                                                        ripple={false}
+                                                        variant='secondary'
+                                                        size='icon'
+                                                        onClick={() => setEditingImageIndex(productImages.indexOf(image))}
+                                                    >
+                                                        <Edit className='h-3 w-3' />
+                                                    </Button>
+                                                    <Button
+                                                        ripple={false}
+                                                        variant='destructive'
+                                                        size='icon'
+                                                        onClick={() => handleDeleteImage(image.id)}
+                                                    >
+                                                        <XIcon className='h-3 w-3' />
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </Sortable.Item>
                                     ))}
@@ -306,7 +451,7 @@ export default function Show({ item }: Props) {
                     </Card.Card>
 
                     {/* Product Units Section */}
-                    <Card.Card variant='agricultural-glass'>
+                    <Card.Card variant='agricultural-glass' className='flex-1'>
                         <Card.CardHeader className='flex flex-row items-center justify-between'>
                             <div>
                                 <Card.CardTitle>Product Units</Card.CardTitle>
@@ -330,36 +475,17 @@ export default function Show({ item }: Props) {
                                         <div className='grid gap-4 py-4'>
                                             <div className='grid gap-2'>
                                                 <Label htmlFor='unit_type'>Unit Type</Label>
-                                                <Command className='rounded-lg border shadow-md'>
-                                                    <CommandInput
-                                                        placeholder='Search unit type...'
-                                                        value={unitForm.data.unit_type}
-                                                        onValueChange={(value) => unitForm.setData('unit_type', value)}
-                                                    />
-                                                    <CommandList>
-                                                        <CommandEmpty>Press enter to add "{unitForm.data.unit_type}" as a new unit</CommandEmpty>
-                                                        <CommandGroup heading='Common Units'>
-                                                            {[
-                                                                { value: 'kg', label: 'Kilogram (kg)' },
-                                                                { value: 'karung', label: 'Karung' },
-                                                                { value: 'ton', label: 'Ton' },
-                                                                { value: 'pieces', label: 'Pieces' },
-                                                                { value: 'ikat', label: 'Ikat' },
-                                                                { value: 'gram', label: 'Gram (g)' },
-                                                                { value: 'pack', label: 'Pack' },
-                                                                { value: 'box', label: 'Box' },
-                                                            ].map((unit) => (
-                                                                <CommandItem
-                                                                    key={unit.value}
-                                                                    value={unit.value}
-                                                                    onSelect={(value) => unitForm.setData('unit_type', value)}
-                                                                >
-                                                                    {unit.label}
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
+                                                <Combobox
+                                                    value={unitForm.data.unit_type}
+                                                    onValueChange={(value: string) => unitForm.setData('unit_type', value)}
+                                                    options={unitTypes}
+                                                    placeholder='Search unit type...'
+                                                    allowCustom={true}
+                                                    onCreateNew={(newType: string) => {
+                                                        setUnitTypes((prev) => [...prev, newType]);
+                                                        unitForm.setData('unit_type', newType);
+                                                    }}
+                                                />
                                             </div>
                                             <div className='grid gap-2'>
                                                 <Label htmlFor='unit_label'>Unit Label</Label>
@@ -420,7 +546,7 @@ export default function Show({ item }: Props) {
                                 <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Edit Unit</DialogTitle>
-                                        <DialogDescription>Update the details for this product unit.</DialogDescription>
+                                        <DialogDescription>Update the details of this unit.</DialogDescription>
                                     </DialogHeader>
                                     <form
                                         onSubmit={(e: React.FormEvent) => {
@@ -431,23 +557,17 @@ export default function Show({ item }: Props) {
                                         <div className='grid gap-4 py-4'>
                                             <div className='grid gap-2'>
                                                 <Label htmlFor='edit_unit_type'>Unit Type</Label>
-                                                <Command className='border'>
-                                                    <CommandInput placeholder='Search unit type...' />
-                                                    <CommandList>
-                                                        <CommandEmpty>No unit type found.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {['kg', 'karung', 'ton', 'pieces', 'ikat'].map((type) => (
-                                                                <CommandItem
-                                                                    key={type}
-                                                                    value={type}
-                                                                    onSelect={() => editUnitForm.setData('unit_type', type)}
-                                                                >
-                                                                    {type}
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
+                                                <Combobox
+                                                    value={editUnitForm.data.unit_type}
+                                                    onValueChange={(value: string) => editUnitForm.setData('unit_type', value)}
+                                                    options={unitTypes}
+                                                    placeholder='Search unit type...'
+                                                    allowCustom={true}
+                                                    onCreateNew={(newType: string) => {
+                                                        setUnitTypes((prev) => [...prev, newType]);
+                                                        editUnitForm.setData('unit_type', newType);
+                                                    }}
+                                                />
                                             </div>
                                             <div className='grid gap-2'>
                                                 <Label htmlFor='edit_unit_label'>Unit Label</Label>
@@ -524,53 +644,102 @@ export default function Show({ item }: Props) {
                                 <Sortable.Content className='space-y-2'>
                                     {productUnits.map((unit) => (
                                         <Sortable.Item key={unit.id} value={unit.id} className='relative'>
-                                            <div className='group flex items-center gap-3 rounded-lg border border-border/50 bg-gradient-to-br from-card to-card/95 p-6 shadow-sm transition-all hover:border-border hover:shadow-md'>
-                                                {/* Drag Handle */}
-                                                <Sortable.ItemHandle className='flex h-6 w-6 cursor-grab items-center justify-center rounded opacity-40 transition-opacity hover:bg-muted hover:opacity-100 active:cursor-grabbing'>
-                                                    <GripVertical className='h-4 w-4 text-muted-foreground' />
-                                                </Sortable.ItemHandle>
-
-                                                {/* Unit Content */}
-                                                <div className='flex-1 space-y-2'>
-                                                    <div className='flex items-center gap-2'>
-                                                        <h4 className='font-medium tracking-tight'>{unit.unit_label}</h4>
+                                            <Item variant='muted' className='group transition-all hover:shadow-md'>
+                                                <ItemMedia className='!self-center'>
+                                                    <Sortable.ItemHandle className='flex cursor-grab items-center justify-center rounded opacity-40 transition-opacity hover:bg-muted hover:opacity-100 active:cursor-grabbing'>
+                                                        <GripVertical className='size-4' />
+                                                    </Sortable.ItemHandle>
+                                                </ItemMedia>
+                                                <ItemContent>
+                                                    <ItemTitle className='flex items-center gap-2'>
+                                                        {unit.unit_label} ({unit.unit_type})
                                                         {!unit.is_active && (
                                                             <span className='rounded-full bg-secondary/10 px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
                                                                 Inactive
                                                             </span>
                                                         )}
-                                                    </div>
-                                                    <div className='flex gap-4'>
-                                                        <div className='flex items-center gap-1.5'>
+                                                    </ItemTitle>
+                                                    <ItemDescription className='flex gap-4'>
+                                                        <span className='flex items-center gap-1.5'>
                                                             <span className='text-xs font-medium text-muted-foreground uppercase'>Stock</span>
                                                             <span className='text-sm font-medium'>{unit.stock_quantity}</span>
-                                                        </div>
-                                                        <div className='flex items-center gap-1.5'>
+                                                        </span>
+                                                        <span className='flex items-center gap-1.5'>
                                                             <span className='text-xs font-medium text-muted-foreground uppercase'>Price</span>
                                                             <span className='text-sm font-medium'>{unit.formatted_price_per_unit}</span>
-                                                        </div>
-                                                    </div>
-                                                    {unit.notes && <p className='mt-1 text-sm text-muted-foreground'>{unit.notes}</p>}
-                                                </div>
+                                                        </span>
+                                                    </ItemDescription>
 
-                                                {/* Action Buttons */}
-                                                <div className='flex items-center gap-2'>
+                                                    {unit.notes && <ItemDescription className='mt-2'>{unit.notes}</ItemDescription>}
+                                                </ItemContent>
+                                                <ItemActions>
                                                     <Button variant='secondary' size='sm' onClick={() => handleEditUnit(unit)}>
                                                         <Edit />
                                                     </Button>
                                                     <Button variant='destructive' size='sm' onClick={() => handleDeleteUnit(unit.id)}>
                                                         <Trash2 />
                                                     </Button>
-                                                </div>
-                                            </div>
+                                                </ItemActions>
+                                            </Item>
                                         </Sortable.Item>
                                     ))}
                                 </Sortable.Content>
                             </Sortable.Root>
                         </Card.CardContent>
                     </Card.Card>
-                </div>
+                </main>
             </div>
+
+            {/* Edit Image Dialog */}
+            <Dialog open={editingImageIndex !== null} onOpenChange={(open) => !open && setEditingImageIndex(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Image Alt Text</DialogTitle>
+                        <DialogDescription>Update the accessibility description for this image.</DialogDescription>
+                    </DialogHeader>
+                    {editingImageIndex !== null && productImages[editingImageIndex] && (
+                        <form
+                            onSubmit={(e: React.FormEvent) => {
+                                e.preventDefault();
+                                handleUpdateImageAltText();
+                            }}
+                        >
+                            <div className='grid gap-4 py-4'>
+                                <div className='flex items-start gap-4'>
+                                    <div className='relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border bg-muted'>
+                                        <img
+                                            src={productImages[editingImageIndex].url}
+                                            alt={productImages[editingImageIndex].alt_text || 'Product image'}
+                                            className='h-full w-full object-cover'
+                                        />
+                                    </div>
+                                    <div className='flex-1 space-y-2'>
+                                        <Label htmlFor='edit_alt_text'>Alt Text</Label>
+                                        <Textarea
+                                            id='edit_alt_text'
+                                            placeholder='Describe this image for accessibility'
+                                            value={productImages[editingImageIndex].alt_text || ''}
+                                            onChange={(e) => {
+                                                setProductImages((prev) =>
+                                                    prev.map((img, idx) => (idx === editingImageIndex ? { ...img, alt_text: e.target.value } : img)),
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button type='button' variant='outline' onClick={() => setEditingImageIndex(null)}>
+                                    Cancel
+                                </Button>
+                                <Button type='submit' variant='agricultural'>
+                                    Update Alt Text
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    )}
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }

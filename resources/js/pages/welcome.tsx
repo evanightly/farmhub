@@ -19,13 +19,15 @@ export default function Welcome() {
     const [searchTerm, setSearchTerm] = React.useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const [products, setProducts] = React.useState<App.Data.ProductData[]>([]);
-    const { addToCart, getTotalItems, getItemQuantity } = useCart();
+    const [isLoading, setIsLoading] = React.useState(true);
+    const { getTotalItems } = useCart();
 
     const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
     React.useEffect(() => {
+        setIsLoading(true);
         axios
             .get(
                 ProductController.index(
@@ -45,6 +47,9 @@ export default function Welcome() {
             })
             .catch((error) => {
                 console.error('Error fetching products:', error);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     }, [debouncedSearchTerm]);
 
@@ -137,7 +142,17 @@ export default function Welcome() {
                     </div>
                 </header>
                 <main className='relative container mx-auto p-6'>
-                    {products.length > 0 ? (
+                    {isLoading ? (
+                        <div className='flex min-h-[500px] flex-col items-center justify-center text-center'>
+                            <div className='relative mb-6'>
+                                <div className='h-20 w-20 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600 dark:border-emerald-800 dark:border-t-emerald-400'></div>
+                            </div>
+                            <h3 className='mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100'>Loading products...</h3>
+                            <p className='max-w-md leading-relaxed text-slate-600 dark:text-slate-400'>
+                                Please wait while we fetch the freshest agricultural products for you.
+                            </p>
+                        </div>
+                    ) : products.length > 0 ? (
                         <>
                             <div className='mb-8 text-center'>
                                 <h2 className='mb-2 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-3xl font-bold text-transparent dark:from-slate-100 dark:to-slate-400'>
@@ -198,7 +213,6 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
         const harvestDate = new Date(product.harvest_date);
         const expiryDate = new Date(product.expiry_date);
         const today = new Date();
-        const totalDays = (expiryDate.getTime() - harvestDate.getTime()) / (1000 * 3600 * 24);
         const daysFromHarvest = (today.getTime() - harvestDate.getTime()) / (1000 * 3600 * 24);
         const daysToExpiry = (expiryDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
 
