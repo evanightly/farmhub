@@ -27,7 +27,6 @@ jobs:
 
             # Stash any local changes and force pull
             echo "🔄 Pulling latest changes from GitHub..."
-            git stash --include-untracked || true
             git fetch origin main
             git reset --hard origin/main
             git clean -fd
@@ -82,13 +81,6 @@ jobs:
             echo "� Restarting services..."
             sudo systemctl reload nginx
             sudo systemctl restart php8.3-fpm
-
-            # Clear opcache to ensure new code is loaded
-            echo "🧹 Clearing OPcache..."
-            sudo systemctl restart php8.3-fpm
-
-            # Optional: Restart queue workers if you use them
-            # sudo supervisorctl restart laravel-worker:*
 
             echo "✅ Deployment completed successfully!"
             echo "🌐 Application is now live!"

@@ -8,7 +8,7 @@ test('registration screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('new users can register', function () {
+test('new customer can register', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -17,5 +17,5 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('transactions', absolute: false));
 });
