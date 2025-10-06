@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import type { DragEndEvent } from '@dnd-kit/core';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Edit, GripVertical, Trash2, X as XIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -209,15 +209,12 @@ export default function Show({ item }: Props) {
         });
         formData.append('is_primary', imageForm.data.is_primary ? '1' : '0');
         formData.append('product_id', item.id.toString());
-        axios
-            .post(ProductImageController.store().url, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-            .finally(() => {
-                location.reload(); //bad fix
-            });
+        router.post(ProductImageController.store().url, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            forceFormData: true,
+        });
     };
 
     const handleAddUnit = async () => {
