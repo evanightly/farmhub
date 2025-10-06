@@ -1,5 +1,31 @@
 # 🚀 Quick Deployment Setup
 
+## Common Issues & Fixes
+
+### 🔴 502 Bad Gateway Error
+
+**Cause:** Nginx can't communicate with PHP-FPM or timeout issues
+**Fix:** Run the nginx configuration fix script
+
+```bash
+sudo bash /var/www/farmhub/deploy/fix-nginx-errors.sh
+```
+
+### 🔴 413 Request Entity Too Large
+
+**Cause:** File upload exceeds nginx limits (default 1MB)
+**Fix:** Same script above increases limit to 100MB
+
+### 🔍 Diagnosis
+
+Run this to diagnose issues:
+
+```bash
+sudo bash /var/www/farmhub/deploy/diagnose-issues.sh
+```
+
+---
+
 ## Required GitHub Secrets
 
 | Secret           | Value               | Example                             |

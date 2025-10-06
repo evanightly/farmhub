@@ -62,10 +62,16 @@ echo "🔒 Setting proper permissions..."
 sudo chown -R www-data:www-data storage bootstrap/cache public/build
 sudo chmod -R 775 storage bootstrap/cache public/build
 
-# Clear OPcache and restart services
-echo "🔄 Restarting services..."
-sudo systemctl reload nginx
-sudo systemctl restart php8.3-fpm
+# Apply nginx fixes if needed
+if [ -f "deploy/fix-nginx-errors.sh" ]; then
+    echo "🔧 Checking and applying nginx configuration fixes..."
+    sudo bash deploy/fix-nginx-errors.sh
+else
+    # Clear OPcache and restart services
+    echo "🔄 Restarting services..."
+    sudo systemctl reload nginx
+    sudo systemctl restart php8.3-fpm
+fi
 
 # Verify build files exist
 echo "🔍 Verifying build files..."
