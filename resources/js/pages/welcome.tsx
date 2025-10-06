@@ -3,6 +3,7 @@ import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import * as Card from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import * as Dialog from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/contexts/CartContext';
@@ -11,7 +12,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useDebounce } from '@uidotdev/usehooks';
 import axios from 'axios';
-import { Calendar, Clock, Eye, Heart, Leaf, Package, Plus, ShoppingCart, Sparkles, Star } from 'lucide-react';
+import { Calendar, Clock, Eye, Heart, Leaf, Package, Plus, ShoppingCart, Sparkles } from 'lucide-react';
 import React from 'react';
 
 export default function Welcome() {
@@ -202,9 +203,11 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
     const primaryImage = product.product_images?.find((img) => img.is_primary) || product.product_images?.[0];
     const [selectedUnit, setSelectedUnit] = React.useState(product.product_units?.[0]?.id?.toString() || '');
     const [isHovered, setIsHovered] = React.useState(false);
+    const [dialogCurrentImageIndex, setDialogCurrentImageIndex] = React.useState(0);
     const { addToCart, getItemQuantity } = useCart();
 
     const selectedUnitData = product.product_units?.find((unit) => unit.id.toString() === selectedUnit);
+    const hasMultipleImages = (product.product_images?.length || 0) > 1;
 
     // Calculate freshness status
     const getFreshnessStatus = () => {
@@ -280,7 +283,6 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
                                       : 'border-red-400 bg-red-500/90 text-white'
                         }`}
                     >
-                        <Star className='mr-1 h-3 w-3' />
                         {freshnessStatus.text}
                     </Badge>
                 )}
@@ -294,26 +296,27 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
 
             {/* Product Image */}
             <div className='relative overflow-hidden'>
-                {primaryImage ? (
+                {product.product_images && product.product_images.length > 0 ? (
                     <Dialog.Dialog>
                         <Dialog.DialogTrigger asChild>
                             <div className='group/image relative aspect-square w-full cursor-pointer overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950 dark:to-teal-950'>
                                 <img
-                                    src={primaryImage.url || ''}
-                                    alt={primaryImage.alt_text || product.name || 'Product Image'}
-                                    className='h-full w-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1'
+                                    src={primaryImage?.url || ''}
+                                    alt={primaryImage?.alt_text || product.name || 'Product Image'}
+                                    className='h-full w-full object-cover transition-all duration-700 group-hover/image:scale-110 group-hover/image:rotate-1'
                                 />
+
                                 {/* Image overlay on hover */}
-                                <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
-                                <div className='absolute right-3 bottom-3 left-3 translate-y-2 transform opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100'>
+                                <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover/image:opacity-100' />
+                                <div className='absolute right-3 bottom-3 left-3 translate-y-2 transform opacity-0 transition-all duration-300 group-hover/image:translate-y-0 group-hover/image:opacity-100'>
                                     <div className='flex items-center gap-2 text-sm font-medium text-white'>
                                         <Eye className='h-4 w-4' />
-                                        <span>View Gallery</span>
+                                        <span>{hasMultipleImages ? `View Gallery (${product.product_images.length})` : 'View Image'}</span>
                                     </div>
                                 </div>
                             </div>
                         </Dialog.DialogTrigger>
-                        <Dialog.DialogContent className='max-w-6xl border-emerald-200 bg-white/95 backdrop-blur-lg dark:border-emerald-800 dark:bg-slate-900/95'>
+                        <Dialog.DialogContent className='max-h-[85dvh] border-emerald-200 bg-white/95 backdrop-blur-lg dark:border-emerald-800 dark:bg-slate-900/95'>
                             <Dialog.DialogHeader>
                                 <Dialog.DialogTitle className='flex items-center gap-3 text-2xl'>
                                     <Leaf className='h-6 w-6 text-emerald-600 dark:text-emerald-400' />
@@ -322,22 +325,97 @@ const ProductCard = ({ product }: { product: App.Data.ProductData }) => {
                                     </span>
                                 </Dialog.DialogTitle>
                                 <Dialog.DialogDescription className='text-slate-600 dark:text-slate-400'>
-                                    High-quality images of this premium agricultural product
+                                    {hasMultipleImages ? `Image gallery with ${product.product_images.length} photos` : 'Product image'}
                                 </Dialog.DialogDescription>
                             </Dialog.DialogHeader>
-                            <div className='grid max-h-[70vh] grid-cols-1 gap-6 overflow-y-auto p-6 md:grid-cols-2 lg:grid-cols-3'>
-                                {product.product_images?.map((img, index) => (
-                                    <div
-                                        key={img.id}
-                                        className='group/gallery aspect-square w-full overflow-hidden rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl'
-                                    >
-                                        <img
-                                            src={img.url || ''}
-                                            alt={img.alt_text || `${product.name} - Image ${index + 1}`}
-                                            className='h-full w-full object-cover transition-transform duration-300 group-hover/gallery:scale-105'
-                                        />
+
+                            <div>
+                                {hasMultipleImages ? (
+                                    <div className='flex flex-col gap-4'>
+                                        {/* Main carousel */}
+                                        <div className='relative'>
+                                            <Carousel
+                                                className='w-full'
+                                                opts={{
+                                                    startIndex: dialogCurrentImageIndex,
+                                                    loop: true,
+                                                }}
+                                                setApi={(api) => {
+                                                    if (api) {
+                                                        api.on('select', () => {
+                                                            setDialogCurrentImageIndex(api.selectedScrollSnap());
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <CarouselContent>
+                                                    {product.product_images.map((img, index) => (
+                                                        <CarouselItem key={img.id}>
+                                                            <div className='flex flex-col items-center space-y-4'>
+                                                                <div className='aspect-square w-full max-w-2xl overflow-hidden rounded-2xl shadow-lg'>
+                                                                    <img
+                                                                        src={img.url || ''}
+                                                                        alt={img.alt_text || `${product.name} - Image ${index + 1}`}
+                                                                        className='h-full w-full object-cover'
+                                                                    />
+                                                                </div>
+                                                                {/* Alt text display */}
+                                                                {img.alt_text && (
+                                                                    <div className='rounded-lg bg-slate-100 px-4 py-2 dark:bg-slate-800'>
+                                                                        <p className='text-sm text-slate-600 italic dark:text-slate-400'>
+                                                                            {img.alt_text}
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </CarouselItem>
+                                                    ))}
+                                                </CarouselContent>
+                                                <CarouselPrevious className={buttonVariants()} />
+                                                <CarouselNext className={buttonVariants()} />
+                                            </Carousel>
+                                        </div>
+
+                                        {/* Thumbnail carousel */}
+                                        <div className='flex flex-1'>
+                                            <div className='flex w-full gap-2 overflow-x-scroll rounded-lg bg-slate-100 p-2 dark:bg-slate-800'>
+                                                {product.product_images.map((img, index) => (
+                                                    <button
+                                                        key={img.id}
+                                                        onClick={() => setDialogCurrentImageIndex(index)}
+                                                        className={`aspect-square rounded-lg border-2 transition-all duration-200 ${
+                                                            index === dialogCurrentImageIndex
+                                                                ? 'border-emerald-500 ring-2 ring-emerald-200 dark:ring-emerald-800'
+                                                                : 'border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500'
+                                                        }`}
+                                                    >
+                                                        <img
+                                                            src={img.url || ''}
+                                                            alt={img.alt_text || `Thumbnail ${index + 1}`}
+                                                            className='h-full w-full rounded-md object-cover'
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className='flex flex-col items-center space-y-4'>
+                                        <div className='aspect-square w-full max-w-2xl overflow-hidden rounded-2xl shadow-lg'>
+                                            <img
+                                                src={primaryImage?.url || ''}
+                                                alt={primaryImage?.alt_text || product.name || 'Product Image'}
+                                                className='h-full w-full object-cover'
+                                            />
+                                        </div>
+                                        {/* Alt text display for single image */}
+                                        {primaryImage?.alt_text && (
+                                            <div className='rounded-lg bg-slate-100 px-4 py-2 dark:bg-slate-800'>
+                                                <p className='text-sm text-slate-600 italic dark:text-slate-400'>{primaryImage.alt_text}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </Dialog.DialogContent>
                     </Dialog.Dialog>

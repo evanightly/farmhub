@@ -191,6 +191,7 @@ function CarouselPrevious({
       )}
       disabled={!canScrollPrev}
       onClick={scrollPrev}
+      ripple={false}
       {...props}
     >
       <ArrowLeft />
@@ -221,6 +222,7 @@ function CarouselNext({
       )}
       disabled={!canScrollNext}
       onClick={scrollNext}
+      ripple={false}
       {...props}
     >
       <ArrowRight />
