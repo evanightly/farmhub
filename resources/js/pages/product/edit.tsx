@@ -60,7 +60,7 @@ export default function Edit({ item }: Props) {
                     <p className='text-muted-foreground'>Update your product details</p>
                 </div>
 
-                <Card>
+                <Card variant='agricultural'>
                     <CardContent className='pt-6'>
                         <Form {...ProductController.update.form(item.id)} className='flex flex-col gap-6' encType='multipart/form-data'>
                             <div className='grid gap-6'>
