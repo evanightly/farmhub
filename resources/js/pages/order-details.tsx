@@ -184,7 +184,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                         </Card.CardHeader>
                     </Card.Card>
 
-                    <Card.Card>
+                    <Card.Card variant='agricultural-glass'>
                         <Card.CardHeader>
                             <Card.CardTitle>Order Items</Card.CardTitle>
                         </Card.CardHeader>
@@ -215,7 +215,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                     </Card.Card>
 
                     {order.payment && (
-                        <Card.Card>
+                        <Card.Card variant='agricultural-glass'>
                             <Card.CardHeader>
                                 <Card.CardTitle className='flex items-center gap-2'>
                                     <CreditCard className='h-5 w-5' />
@@ -290,7 +290,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
 
                     {/* Payment Upload Form for QR Access */}
                     {canUploadPayment && (
-                        <Card.Card>
+                        <Card.Card variant='agricultural-glass'>
                             <Card.CardHeader>
                                 <Card.CardTitle className='flex items-center gap-2'>
                                     <Upload className='h-5 w-5' />
@@ -304,7 +304,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                             </Card.CardHeader>
                             <Card.CardContent>
                                 {!showUploadForm ? (
-                                    <Button onClick={() => setShowUploadForm(true)} className='w-full'>
+                                    <Button onClick={() => setShowUploadForm(true)} variant='agricultural' className='w-full'>
                                         <Upload className='mr-2 h-4 w-4' />
                                         Upload Payment Proof
                                     </Button>
@@ -365,12 +365,12 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                                         </div>
 
                                         <div className='flex gap-2'>
-                                            <Button type='submit' disabled={processing} className='flex-1'>
+                                            <Button type='submit' disabled={processing} variant='agricultural' className='flex-1'>
                                                 {processing ? 'Uploading...' : 'Upload Payment Proof'}
                                             </Button>
                                             <Button
                                                 type='button'
-                                                variant='outline'
+                                                variant='agricultural-outline'
                                                 onClick={() => {
                                                     setShowUploadForm(false);
                                                     reset();
@@ -387,7 +387,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                 </div>
 
                 <div className='space-y-6'>
-                    <Card.Card>
+                    <Card.Card variant='agricultural-glass'>
                         <Card.CardHeader>
                             <Card.CardTitle className='flex items-center gap-2'>
                                 <User className='h-5 w-5' />
@@ -411,7 +411,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                         </Card.CardContent>
                     </Card.Card>
 
-                    <Card.Card>
+                    <Card.Card variant='agricultural-glass'>
                         <Card.CardHeader>
                             <Card.CardTitle className='flex items-center gap-2'>
                                 <MapPin className='h-5 w-5' />
@@ -424,7 +424,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                     </Card.Card>
 
                     {order.notes && (
-                        <Card.Card>
+                        <Card.Card variant='agricultural-glass'>
                             <Card.CardHeader>
                                 <Card.CardTitle>Order Notes</Card.CardTitle>
                             </Card.CardHeader>
@@ -435,11 +435,11 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                     )}
 
                     <div className='space-y-3'>
-                        <Button asChild className='w-full'>
+                        <Button asChild variant='agricultural' className='w-full'>
                             <Link href={home()}>Continue Shopping</Link>
                         </Button>
                         {!isQrAccess && (
-                            <Button asChild variant='outline' className='w-full'>
+                            <Button asChild variant='agricultural-outline' className='w-full'>
                                 <Link href={transactions()}>Back to Transactions</Link>
                             </Button>
                         )}

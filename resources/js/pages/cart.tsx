@@ -121,7 +121,7 @@ export default function Cart() {
                                         <p className='mt-1 text-slate-600 dark:text-slate-400'>{getTotalItems()} premium items ready for checkout</p>
                                     </div>
                                     <Button
-                                        variant='outline'
+                                        variant='agricultural-outline'
                                         size='sm'
                                         onClick={clearCart}
                                         className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300'
@@ -268,21 +268,13 @@ export default function Cart() {
                                         </div>
                                     </Card.CardContent>
                                     <Card.CardFooter className='flex flex-col gap-4 pt-6'>
-                                        <Button
-                                            asChild
-                                            className='h-12 w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl'
-                                            size='lg'
-                                        >
+                                        <Button asChild variant='agricultural' className='h-12 w-full' size='lg'>
                                             <Link href={checkout()}>
                                                 <CheckCircle className='mr-2 h-5 w-5' />
                                                 Proceed to Checkout
                                             </Link>
                                         </Button>
-                                        <Button
-                                            variant='outline'
-                                            className='h-12 w-full border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950'
-                                            asChild
-                                        >
+                                        <Button variant='agricultural-outline' className='h-12 w-full' asChild>
                                             <Link href={home()}>
                                                 <Sparkles className='mr-2 h-4 w-4' />
                                                 Continue Shopping
@@ -303,11 +295,7 @@ export default function Cart() {
                             <p className='mb-8 max-w-md leading-relaxed text-slate-600 dark:text-slate-400'>
                                 Looks like you haven't added any premium agricultural products to your cart yet. Start exploring our fresh collection!
                             </p>
-                            <Button
-                                asChild
-                                size='lg'
-                                className='bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl'
-                            >
+                            <Button asChild size='lg' variant='agricultural'>
                                 <Link href={home()}>
                                     <Leaf className='mr-2 h-5 w-5' />
                                     Discover Fresh Products

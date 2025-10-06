@@ -126,7 +126,7 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                     {row.original.proof_image_path && (
                         <Dialog.Dialog>
                             <Dialog.DialogTrigger asChild>
-                                <Button size='sm' variant='outline'>
+                                <Button size='sm' variant='agricultural-ghost'>
                                     <FileImage className='h-4 w-4' />
                                 </Button>
                             </Dialog.DialogTrigger>
@@ -150,11 +150,11 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                                         </div>
                                     )}
                                     <div className='flex justify-end gap-2'>
-                                        <Button variant='outline' onClick={() => handleVerifyPayment(row.original, 'reject')}>
+                                        <Button variant='agricultural-outline' onClick={() => handleVerifyPayment(row.original, 'reject')}>
                                             <XCircle className='mr-2 h-4 w-4' />
                                             Reject
                                         </Button>
-                                        <Button onClick={() => handleVerifyPayment(row.original, 'approve')}>
+                                        <Button variant='agricultural' onClick={() => handleVerifyPayment(row.original, 'approve')}>
                                             <CheckCircle className='mr-2 h-4 w-4' />
                                             Approve
                                         </Button>
@@ -163,10 +163,10 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                             </Dialog.DialogContent>
                         </Dialog.Dialog>
                     )}
-                    <Button size='sm' variant='outline' onClick={() => handleVerifyPayment(row.original, 'approve')}>
+                    <Button size='sm' variant='agricultural-outline' onClick={() => handleVerifyPayment(row.original, 'approve')}>
                         <CheckCircle className='h-4 w-4' />
                     </Button>
-                    <Button size='sm' variant='outline' onClick={() => handleVerifyPayment(row.original, 'reject')}>
+                    <Button size='sm' variant='agricultural-ghost' onClick={() => handleVerifyPayment(row.original, 'reject')}>
                         <XCircle className='h-4 w-4' />
                     </Button>
                 </div>
@@ -176,9 +176,20 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
 
     return (
         <AdminLayout>
+            {/* Page Header */}
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+                    <div>
+                        <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                            Payment Verification
+                        </h1>
+                        <p className='text-muted-foreground'>Review and verify customer payment proofs</p>
+                    </div>
+                </div>
+            </div>
+
             <DataTable
-                title='Payment Verification'
-                description='Review and verify customer payment proofs'
+                title='Payments'
                 data={payments.data}
                 columns={columns}
                 pagination={payments.meta as any}

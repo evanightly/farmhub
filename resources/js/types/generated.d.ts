@@ -10,6 +10,8 @@ instructions: string | null;
 is_active: boolean | null;
 sort_order: number | null;
 metadata: Array<any> | null;
+created_at: string | null;
+updated_at: string | null;
 payments: Array<App.Data.PaymentData> | null;
 };
 export type OrderData = {

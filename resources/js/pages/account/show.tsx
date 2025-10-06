@@ -1,7 +1,8 @@
 import AccountController from '@/actions/App/Http/Controllers/AccountController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import * as Card from '@/components/ui/card';
+import { Label as LabelComponent } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
@@ -50,22 +51,25 @@ export default function Show({ account, payments_count = 0 }: Props) {
         <AppLayout>
             <Head title={`Account: ${account.account_name}`} />
 
-            <div className='space-y-6'>
-                <div className='flex items-center justify-between'>
+            {/* Page Header */}
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div className='flex items-center gap-4'>
-                        <Button variant='outline' size='sm' asChild>
+                        <Button variant='agricultural-outline' size='sm' asChild>
                             <Link href={AccountController.index().url}>
                                 <ArrowLeft className='h-4 w-4' />
                                 Back to Accounts
                             </Link>
                         </Button>
                         <div>
-                            <h1 className='text-3xl font-bold tracking-tight'>{account.account_name}</h1>
+                            <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                                {account.account_name}
+                            </h1>
                             <p className='text-muted-foreground'>Account details and payment information</p>
                         </div>
                     </div>
                     <div className='flex gap-2'>
-                        <Button variant='outline' asChild>
+                        <Button variant='agricultural-outline' asChild>
                             <Link href={AccountController.edit(account.id!).url}>
                                 <Edit className='mr-2 h-4 w-4' />
                                 Edit
@@ -77,17 +81,19 @@ export default function Show({ account, payments_count = 0 }: Props) {
                         </Button>
                     </div>
                 </div>
+            </div>
 
-                <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+            <div className='container mx-auto space-y-8 pb-8'>
+                <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
                     <div className='space-y-6 lg:col-span-2'>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className='flex items-center gap-2'>
+                        <Card.Card variant='agricultural-glass'>
+                            <Card.CardHeader>
+                                <Card.CardTitle className='flex items-center gap-2'>
                                     <CreditCard className='h-5 w-5' />
                                     Account Information
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className='space-y-4'>
+                                </Card.CardTitle>
+                            </Card.CardHeader>
+                            <Card.CardContent className='space-y-4'>
                                 <div className='grid grid-cols-2 gap-4'>
                                     <div>
                                         <Label>Account Name</Label>
@@ -133,48 +139,48 @@ export default function Show({ account, payments_count = 0 }: Props) {
                                         </div>
                                     </div>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </Card.CardContent>
+                        </Card.Card>
 
                         {account.metadata && Object.keys(account.metadata).length > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className='flex items-center gap-2'>
+                            <Card.Card variant='agricultural-glass'>
+                                <Card.CardHeader>
+                                    <Card.CardTitle className='flex items-center gap-2'>
                                         <FileText className='h-5 w-5' />
                                         Additional Information
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                                    </Card.CardTitle>
+                                </Card.CardHeader>
+                                <Card.CardContent>
                                     <pre className='overflow-auto rounded-lg bg-muted p-3 text-sm'>{JSON.stringify(account.metadata, null, 2)}</pre>
-                                </CardContent>
-                            </Card>
+                                </Card.CardContent>
+                            </Card.Card>
                         )}
                     </div>
 
                     <div className='space-y-6'>
                         {account.account_logo && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Account Logo</CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                            <Card.Card variant='agricultural-glass'>
+                                <Card.CardHeader>
+                                    <Card.CardTitle>Account Logo</Card.CardTitle>
+                                </Card.CardHeader>
+                                <Card.CardContent>
                                     <img
                                         src={`/storage/${account.account_logo}`}
                                         alt={account.account_name || 'Account logo'}
                                         className='h-auto w-full rounded-lg border'
                                     />
-                                </CardContent>
-                            </Card>
+                                </Card.CardContent>
+                            </Card.Card>
                         )}
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className='flex items-center gap-2'>
+                        <Card.Card variant='agricultural-glass'>
+                            <Card.CardHeader>
+                                <Card.CardTitle className='flex items-center gap-2'>
                                     <Hash className='h-5 w-5' />
                                     Usage Statistics
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className='space-y-4'>
+                                </Card.CardTitle>
+                            </Card.CardHeader>
+                            <Card.CardContent className='space-y-4'>
                                 <div>
                                     <Label>Total Payments</Label>
                                     <p className='text-2xl font-bold'>{payments_count}</p>
@@ -191,21 +197,24 @@ export default function Show({ account, payments_count = 0 }: Props) {
                                     <Label>Last Updated</Label>
                                     <p className='text-sm text-muted-foreground'>{new Date(account.updated_at!).toLocaleDateString()}</p>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </Card.CardContent>
+                        </Card.Card>
 
                         {payments_count > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className='text-amber-600'>⚠️ Deletion Warning</CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                            <Card.Card
+                                variant='agricultural-glass'
+                                className='border-amber-200 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/50'
+                            >
+                                <Card.CardHeader>
+                                    <Card.CardTitle className='text-amber-600'>⚠️ Deletion Warning</Card.CardTitle>
+                                </Card.CardHeader>
+                                <Card.CardContent>
                                     <p className='text-sm text-muted-foreground'>
                                         This account cannot be deleted because it has {payments_count} associated payment
                                         {payments_count !== 1 ? 's' : ''}.
                                     </p>
-                                </CardContent>
-                            </Card>
+                                </Card.CardContent>
+                            </Card.Card>
                         )}
                     </div>
                 </div>
@@ -216,5 +225,5 @@ export default function Show({ account, payments_count = 0 }: Props) {
 
 // Helper component for labels
 function Label({ children }: { children: React.ReactNode }) {
-    return <span className='text-sm font-medium text-muted-foreground'>{children}</span>;
+    return <LabelComponent className='text-sm font-medium text-muted-foreground'>{children}</LabelComponent>;
 }

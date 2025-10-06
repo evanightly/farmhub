@@ -1,11 +1,10 @@
-import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { Button } from '@/components/ui/button';
 import * as Card from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { logout } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BarChart3, CheckCircle, Clock, DollarSign, Package, Settings, ShoppingCart, TrendingUp, Truck, Users } from 'lucide-react';
+import { CheckCircle, Clock, DollarSign, Package, Settings, ShoppingCart, TrendingUp, Truck, Users } from 'lucide-react';
 
 interface DashboardStats {
     total_orders: number;
@@ -98,138 +97,137 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
     return (
         <AppLayout>
             <Head title='Admin Dashboard' />
-            <div className='min-h-screen bg-gradient-to-br from-background via-background to-accent/10'>
-                <header className='sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm'>
-                    <div className='container mx-auto flex items-center justify-between p-4'>
-                        <div className='flex items-center gap-3'>
-                            <BarChart3 className='h-8 w-8 text-primary' />
-                            <h1 className='text-2xl font-bold text-primary'>Admin Dashboard</h1>
-                        </div>
-                        <nav className='flex items-center gap-3'>
-                            <Button asChild variant='ghost' size='icon'>
-                                <AnimatedThemeToggler />
-                            </Button>
-                            <span className='text-sm text-muted-foreground'>Welcome, {auth.user?.name}</span>
-                            <Button asChild variant='ghost'>
-                                <Link href={logout()} method='post' as='button'>
-                                    Logout
-                                </Link>
-                            </Button>
-                        </nav>
-                    </div>
-                </header>
 
-                <main className='container mx-auto p-6'>
-                    {/* Overview Stats */}
-                    <div className='mb-8'>
-                        <h2 className='mb-4 text-xl font-semibold'>Overview</h2>
-                        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
-                            {statCards.map((stat) => (
-                                <Card.Card key={stat.title}>
-                                    <Card.CardContent className='p-6'>
-                                        <div className='flex items-center justify-between'>
-                                            <div>
-                                                <p className='text-sm text-muted-foreground'>{stat.title}</p>
-                                                <p className='text-2xl font-bold'>{stat.value}</p>
-                                            </div>
-                                            <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                                                <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                            </div>
-                                        </div>
-                                    </Card.CardContent>
-                                </Card.Card>
-                            ))}
-                        </div>
+            {/* Page Header */}
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+                    <div>
+                        <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                            Admin Dashboard
+                        </h1>
+                        <p className='text-muted-foreground'>Overview of your e-catalog performance</p>
                     </div>
-
-                    {/* Order Status */}
-                    <div className='mb-8'>
-                        <h2 className='mb-4 text-xl font-semibold'>Order Status</h2>
-                        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
-                            {orderStatusCards.map((stat) => (
-                                <Card.Card key={stat.title}>
-                                    <Card.CardContent className='p-6'>
-                                        <div className='flex items-center justify-between'>
-                                            <div>
-                                                <p className='text-sm text-muted-foreground'>{stat.title}</p>
-                                                <p className='text-2xl font-bold'>{stat.value}</p>
-                                            </div>
-                                            <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                                                <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                                            </div>
-                                        </div>
-                                    </Card.CardContent>
-                                </Card.Card>
-                            ))}
-                        </div>
+                    <div className='flex items-center gap-3'>
+                        <span className='text-sm text-muted-foreground'>Welcome, {auth.user?.name}</span>
+                        <Button asChild variant='agricultural-outline'>
+                            <Link href={logout()} method='post' as='button'>
+                                Logout
+                            </Link>
+                        </Button>
                     </div>
+                </div>
+            </div>
 
-                    {/* Quick Actions */}
-                    <div className='mb-8'>
-                        <h2 className='mb-4 text-xl font-semibold'>Quick Actions</h2>
-                        <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                            <Card.Card>
+            <div className='container mx-auto space-y-8 pb-8'>
+                {/* Overview Stats */}
+                <div>
+                    <h2 className='mb-4 text-xl font-semibold'>Overview</h2>
+                    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+                        {statCards.map((stat) => (
+                            <Card.Card key={stat.title} variant='agricultural-glass'>
                                 <Card.CardContent className='p-6'>
-                                    <div className='flex items-center gap-4'>
-                                        <Package className='h-8 w-8 text-primary' />
-                                        <div className='flex-1'>
-                                            <h3 className='font-semibold'>Manage Orders</h3>
-                                            <p className='text-sm text-muted-foreground'>View and update order statuses</p>
+                                    <div className='flex items-center justify-between'>
+                                        <div>
+                                            <p className='text-sm text-muted-foreground'>{stat.title}</p>
+                                            <p className='text-2xl font-bold'>{stat.value}</p>
                                         </div>
-                                        <Button asChild>
-                                            <Link href='/admin/orders'>Go</Link>
-                                        </Button>
+                                        <div className={`rounded-full p-3 ${stat.bgColor}`}>
+                                            <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                                        </div>
                                     </div>
                                 </Card.CardContent>
                             </Card.Card>
-
-                            <Card.Card>
-                                <Card.CardContent className='p-6'>
-                                    <div className='flex items-center gap-4'>
-                                        <ShoppingCart className='h-8 w-8 text-primary' />
-                                        <div className='flex-1'>
-                                            <h3 className='font-semibold'>Manage Products</h3>
-                                            <p className='text-sm text-muted-foreground'>Add, edit, and organize products</p>
-                                        </div>
-                                        <Button asChild variant='outline'>
-                                            <Link href='/products'>Go</Link>
-                                        </Button>
-                                    </div>
-                                </Card.CardContent>
-                            </Card.Card>
-
-                            <Card.Card>
-                                <Card.CardContent className='p-6'>
-                                    <div className='flex items-center gap-4'>
-                                        <Settings className='h-8 w-8 text-primary' />
-                                        <div className='flex-1'>
-                                            <h3 className='font-semibold'>Settings</h3>
-                                            <p className='text-sm text-muted-foreground'>Configure system settings</p>
-                                        </div>
-                                        <Button asChild variant='outline'>
-                                            <Link href='/settings'>Go</Link>
-                                        </Button>
-                                    </div>
-                                </Card.CardContent>
-                            </Card.Card>
-                        </div>
+                        ))}
                     </div>
+                </div>
 
-                    {/* Recent Activity */}
-                    <Card.Card>
-                        <Card.CardHeader>
-                            <Card.CardTitle className='flex items-center gap-2'>
-                                <TrendingUp className='h-5 w-5' />
-                                Recent Activity
-                            </Card.CardTitle>
-                        </Card.CardHeader>
-                        <Card.CardContent>
-                            <div className='py-8 text-center'>
-                                <p className='text-muted-foreground'>Recent activity will be displayed here</p>
-                            </div>
-                        </Card.CardContent>
-                    </Card.Card>
-                </main>
+                {/* Order Status */}
+                <div className='mb-8'>
+                    <h2 className='mb-4 text-xl font-semibold'>Order Status</h2>
+                    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+                        {orderStatusCards.map((stat) => (
+                            <Card.Card key={stat.title} variant='agricultural-glass'>
+                                <Card.CardContent className='p-6'>
+                                    <div className='flex items-center justify-between'>
+                                        <div>
+                                            <p className='text-sm text-muted-foreground'>{stat.title}</p>
+                                            <p className='text-2xl font-bold'>{stat.value}</p>
+                                        </div>
+                                        <div className={`rounded-full p-3 ${stat.bgColor}`}>
+                                            <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                                        </div>
+                                    </div>
+                                </Card.CardContent>
+                            </Card.Card>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className='mb-8'>
+                    <h2 className='mb-4 text-xl font-semibold'>Quick Actions</h2>
+                    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+                        <Card.Card variant='agricultural-glass'>
+                            <Card.CardContent className='p-6'>
+                                <div className='flex items-center gap-4'>
+                                    <Package className='h-8 w-8 text-primary' />
+                                    <div className='flex-1'>
+                                        <h3 className='font-semibold'>Manage Orders</h3>
+                                        <p className='text-sm text-muted-foreground'>View and update order statuses</p>
+                                    </div>
+                                    <Button asChild variant='agricultural'>
+                                        <Link href='/admin/orders'>Go</Link>
+                                    </Button>
+                                </div>
+                            </Card.CardContent>
+                        </Card.Card>
+
+                        <Card.Card variant='agricultural-glass'>
+                            <Card.CardContent className='p-6'>
+                                <div className='flex items-center gap-4'>
+                                    <ShoppingCart className='h-8 w-8 text-primary' />
+                                    <div className='flex-1'>
+                                        <h3 className='font-semibold'>Manage Products</h3>
+                                        <p className='text-sm text-muted-foreground'>Add, edit, and organize products</p>
+                                    </div>
+                                    <Button asChild variant='agricultural'>
+                                        <Link href='/products'>Go</Link>
+                                    </Button>
+                                </div>
+                            </Card.CardContent>
+                        </Card.Card>
+
+                        <Card.Card variant='agricultural-glass'>
+                            <Card.CardContent className='p-6'>
+                                <div className='flex items-center gap-4'>
+                                    <Settings className='h-8 w-8 text-primary' />
+                                    <div className='flex-1'>
+                                        <h3 className='font-semibold'>Settings</h3>
+                                        <p className='text-sm text-muted-foreground'>Configure system settings</p>
+                                    </div>
+                                    <Button asChild variant='agricultural'>
+                                        <Link href='/settings'>Go</Link>
+                                    </Button>
+                                </div>
+                            </Card.CardContent>
+                        </Card.Card>
+                    </div>
+                </div>
+
+                {/* Recent Activity */}
+                <Card.Card variant='agricultural-glass'>
+                    <Card.CardHeader>
+                        <Card.CardTitle className='flex items-center gap-2'>
+                            <TrendingUp className='h-5 w-5' />
+                            Recent Activity
+                        </Card.CardTitle>
+                    </Card.CardHeader>
+                    <Card.CardContent>
+                        <div className='py-8 text-center'>
+                            <p className='text-muted-foreground'>Recent activity will be displayed here</p>
+                        </div>
+                    </Card.CardContent>
+                </Card.Card>
             </div>
         </AppLayout>
     );

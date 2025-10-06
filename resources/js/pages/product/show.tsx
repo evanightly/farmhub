@@ -1,7 +1,7 @@
 import ProductImageController from '@/actions/App/Http/Controllers/ProductImageController';
 import ProductUnitController from '@/actions/App/Http/Controllers/ProductUnitController';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import * as Card from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -214,16 +214,16 @@ export default function Show({ item }: Props) {
 
                 <div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
                     {/* Product Images Section */}
-                    <Card>
-                        <CardHeader>
+                    <Card.Card variant='agricultural-glass'>
+                        <Card.CardHeader>
                             <div className='flex items-center justify-between'>
                                 <div>
-                                    <CardTitle>Product Images</CardTitle>
-                                    <CardDescription>Drag to reorder images. The first image will be the primary one.</CardDescription>
+                                    <Card.CardTitle>Product Images</Card.CardTitle>
+                                    <Card.CardDescription>Drag to reorder images. The first image will be the primary one.</Card.CardDescription>
                                 </div>
                                 <Dialog open={isAddImageOpen} onOpenChange={setIsAddImageOpen}>
                                     <DialogTrigger asChild>
-                                        <Button>Add Images</Button>
+                                        <Button variant='agricultural'>Add Images</Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
@@ -259,14 +259,16 @@ export default function Show({ item }: Props) {
                                                 </div>
                                             </div>
                                             <DialogFooter>
-                                                <Button type='submit'>Upload Images</Button>
+                                                <Button type='submit' variant='agricultural'>
+                                                    Upload Images
+                                                </Button>
                                             </DialogFooter>
                                         </form>
                                     </DialogContent>
                                 </Dialog>
                             </div>
-                        </CardHeader>
-                        <CardContent>
+                        </Card.CardHeader>
+                        <Card.CardContent>
                             <Sortable.Root
                                 value={productImages}
                                 onValueChange={setProductImages}
@@ -300,19 +302,19 @@ export default function Show({ item }: Props) {
                                     ))}
                                 </Sortable.Content>
                             </Sortable.Root>
-                        </CardContent>
-                    </Card>
+                        </Card.CardContent>
+                    </Card.Card>
 
                     {/* Product Units Section */}
-                    <Card>
-                        <CardHeader className='flex flex-row items-center justify-between'>
+                    <Card.Card variant='agricultural-glass'>
+                        <Card.CardHeader className='flex flex-row items-center justify-between'>
                             <div>
-                                <CardTitle>Product Units</CardTitle>
-                                <CardDescription>Manage and organize product units</CardDescription>
+                                <Card.CardTitle>Product Units</Card.CardTitle>
+                                <Card.CardDescription>Manage and organize product units</Card.CardDescription>
                             </div>
                             <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
                                 <DialogTrigger asChild>
-                                    <Button>Add Unit</Button>
+                                    <Button variant='agricultural'>Add Unit</Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
@@ -405,7 +407,9 @@ export default function Show({ item }: Props) {
                                             </div>
                                         </div>
                                         <DialogFooter>
-                                            <Button type='submit'>Add Unit</Button>
+                                            <Button type='submit' variant='agricultural'>
+                                                Add Unit
+                                            </Button>
                                         </DialogFooter>
                                     </form>
                                 </DialogContent>
@@ -493,7 +497,7 @@ export default function Show({ item }: Props) {
                                         <DialogFooter>
                                             <Button
                                                 type='button'
-                                                variant='outline'
+                                                variant='agricultural-outline'
                                                 onClick={() => {
                                                     setIsEditUnitOpen(false);
                                                     setEditingUnit(null);
@@ -502,13 +506,15 @@ export default function Show({ item }: Props) {
                                             >
                                                 Cancel
                                             </Button>
-                                            <Button type='submit'>Update Unit</Button>
+                                            <Button type='submit' variant='agricultural'>
+                                                Update Unit
+                                            </Button>
                                         </DialogFooter>
                                     </form>
                                 </DialogContent>
                             </Dialog>
-                        </CardHeader>
-                        <CardContent>
+                        </Card.CardHeader>
+                        <Card.CardContent>
                             <Sortable.Root
                                 value={productUnits}
                                 onValueChange={setProductUnits}
@@ -561,8 +567,8 @@ export default function Show({ item }: Props) {
                                     ))}
                                 </Sortable.Content>
                             </Sortable.Root>
-                        </CardContent>
-                    </Card>
+                        </Card.CardContent>
+                    </Card.Card>
                 </div>
             </div>
         </AppLayout>

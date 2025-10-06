@@ -136,17 +136,24 @@ class OrderController extends Controller {
         if (Auth::check()) {
             $user = Auth::user();
 
-            // If admin, allow searching any email
-            if ($user->role === 'admin' || $user->role === 'employee') { // You can adjust admin check logic
+            // If admin/employee, allow searching any email or show all orders by default
+            if ($user->role === 'admin' || $user->role === 'employee') {
                 if ($email) {
                     $orders = Order::where('customer_email', $email)
                         ->with(['order_items.product', 'payment'])
                         ->orderBy('created_at', 'desc')
                         ->get()
                         ->map(fn ($order) => OrderData::from($order));
+                } else {
+                    // Show all orders for admin/employee by default
+                    $orders = Order::with(['order_items.product', 'payment'])
+                        ->orderBy('created_at', 'desc')
+                        // ->limit(50) // Limit to prevent performance issues
+                        ->get()
+                        ->map(fn ($order) => OrderData::from($order));
                 }
             } else {
-                // Regular users can only see their own orders
+                // Regular users can only see their own orders automatically
                 $orders = Order::where('customer_email', $user->email)
                     ->with(['order_items.product', 'payment'])
                     ->orderBy('created_at', 'desc')

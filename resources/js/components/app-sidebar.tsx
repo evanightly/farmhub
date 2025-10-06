@@ -1,4 +1,5 @@
 import AccountController from '@/actions/App/Http/Controllers/AccountController';
+import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import ProductController from '@/actions/App/Http/Controllers/ProductController';
 import UserController from '@/actions/App/Http/Controllers/UserController';
 import { NavFooter } from '@/components/nav-footer';
@@ -9,7 +10,7 @@ import { dashboard } from '@/routes';
 import { orders, payments } from '@/routes/admin';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Box, CreditCard, Folder, IdCard, LayoutGrid, Package, Users } from 'lucide-react';
+import { BookOpen, Box, CreditCard, Folder, IdCard, LayoutGrid, Package, Receipt, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -42,6 +43,11 @@ const mainNavItems: NavItem[] = [
         title: 'Payment Verification',
         href: payments(),
         icon: CreditCard,
+    },
+    {
+        title: 'Transactions',
+        href: OrderController.transactions().url,
+        icon: Receipt,
     },
 ];
 

@@ -203,7 +203,7 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                     {row.original.payment?.proof_image_path ? (
                         <Dialog.Dialog>
                             <Dialog.DialogTrigger asChild>
-                                <Button size='sm' variant='outline'>
+                                <Button size='sm' variant='agricultural-ghost'>
                                     <FileImage className='h-3 w-3' />
                                 </Button>
                             </Dialog.DialogTrigger>
@@ -255,7 +255,7 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
             header: 'Actions',
             cell: ({ row }: any) => (
                 <div className='flex gap-2'>
-                    <Button asChild size='sm' variant='outline'>
+                    <Button asChild size='sm' variant='agricultural-outline'>
                         <Link href={`/orders/${row.original.id}`}>
                             <Eye className='h-4 w-4' />
                         </Link>
@@ -267,9 +267,20 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
 
     return (
         <AdminLayout>
+            {/* Page Header */}
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+                    <div>
+                        <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                            Order Management
+                        </h1>
+                        <p className='text-muted-foreground'>Manage customer orders and update order statuses</p>
+                    </div>
+                </div>
+            </div>
+
             <DataTable
-                title='Order Management'
-                description='Manage customer orders and update order statuses'
+                title='Orders'
                 data={orders.data}
                 columns={columns}
                 pagination={orders.meta as any}

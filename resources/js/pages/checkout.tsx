@@ -243,17 +243,10 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                 </Link>
                             ) : (
                                 <>
-                                    <Button
-                                        asChild
-                                        variant='outline'
-                                        className='border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950'
-                                    >
+                                    <Button asChild variant='agricultural-outline'>
                                         <Link href={login()}>Log in</Link>
                                     </Button>
-                                    <Button
-                                        asChild
-                                        className='bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl'
-                                    >
+                                    <Button asChild variant='agricultural'>
                                         <Link href={register()}>
                                             <Heart className='mr-2 h-4 w-4' />
                                             Join Us
@@ -479,7 +472,13 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                             <span className='text-lg'>{formatPrice(getTotalPrice())}</span>
                                         </div>
 
-                                        <Button type='submit' className='w-full' size='lg' disabled={isSubmitting || items.length === 0}>
+                                        <Button
+                                            type='submit'
+                                            variant='agricultural'
+                                            className='w-full'
+                                            size='lg'
+                                            disabled={isSubmitting || items.length === 0}
+                                        >
                                             {isSubmitting ? (
                                                 <>
                                                     <div className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent' />

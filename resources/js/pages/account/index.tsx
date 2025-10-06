@@ -6,6 +6,7 @@ import { FilterType, PaginationMeta } from '@/components/ui/data-table-types';
 import * as DropdownMenu from '@/components/ui/dropdown-menu';
 import AppLayout from '@/layouts/app-layout';
 import { Head, Link, router } from '@inertiajs/react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Edit, MoreHorizontal, Plus, Trash } from 'lucide-react';
 
 type Account = App.Data.AccountData;
@@ -169,7 +170,7 @@ export default function Index({ items, filters }: Props) {
                 return (
                     <DropdownMenu.DropdownMenu>
                         <DropdownMenu.DropdownMenuTrigger asChild>
-                            <Button variant='ghost' className='h-8 w-8 p-0'>
+                            <Button variant='agricultural-ghost' className='h-8 w-8 p-0'>
                                 <span className='sr-only'>Open menu</span>
                                 <MoreHorizontal className='h-4 w-4' />
                             </Button>
@@ -195,44 +196,55 @@ export default function Index({ items, filters }: Props) {
                 );
             },
         },
-    ];
+    ] as (ColumnDef<Account> & {
+        enableFiltering?: boolean;
+        filter?: any;
+        filterOnly?: boolean;
+        header?: string;
+    })[];
 
     return (
         <AppLayout>
             <Head title='Account Management' />
-            <div className='space-y-6'>
-                <div className='flex items-center justify-between'>
+
+            {/* Page Header */}
+            <div className='container mx-auto py-8'>
+                <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
-                        <h1 className='text-3xl font-bold tracking-tight'>Account Management</h1>
+                        <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                            Account Management
+                        </h1>
                         <p className='text-muted-foreground'>Manage payment accounts for your e-catalog</p>
                     </div>
-                    <Button asChild>
-                        <Link href={AccountController.create().url}>
-                            <Plus className='mr-2 h-4 w-4' />
-                            Add Account
-                        </Link>
-                    </Button>
+                    <div className='flex items-center gap-2'>
+                        <Button asChild variant='agricultural'>
+                            <Link href={AccountController.create().url}>
+                                <Plus className='mr-2 h-4 w-4' />
+                                Add Account
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
-
-                <DataTable
-                    title='Accounts'
-                    data={items.data}
-                    columns={columns}
-                    pagination={items}
-                    searchPlaceholder='Search accounts...'
-                    enableSearch={true}
-                    enableColumnFilters={true}
-                    enableMultiSort={true}
-                    routeFunction={AccountController.index}
-                    resetRoute={AccountController.index().url}
-                    emptyMessage='No accounts found'
-                    emptyDescription={
-                        filters.search
-                            ? 'No accounts match your search criteria. Try adjusting your filters.'
-                            : 'Get started by creating your first account.'
-                    }
-                />
             </div>
+
+            <DataTable
+                title='Accounts'
+                data={items.data}
+                columns={columns}
+                pagination={items}
+                searchPlaceholder='Search accounts...'
+                enableSearch={true}
+                enableColumnFilters={true}
+                enableMultiSort={true}
+                routeFunction={AccountController.index}
+                resetRoute={AccountController.index().url}
+                emptyMessage='No accounts found'
+                emptyDescription={
+                    filters.search
+                        ? 'No accounts match your search criteria. Try adjusting your filters.'
+                        : 'Get started by creating your first account.'
+                }
+            />
         </AppLayout>
     );
 }

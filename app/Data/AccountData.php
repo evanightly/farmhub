@@ -35,8 +35,8 @@ class AccountData extends Data {
             is_active: $model->is_active,
             sort_order: $model->sort_order,
             metadata: $model->metadata,
-            created_at: $model->created_at?->toISOString(),
-            updated_at: $model->updated_at?->toISOString(),
+            created_at: $model->created_at,
+            updated_at: $model->updated_at,
             payments: $model->relationLoaded('payments') ? $model->payments?->map(fn ($item) => PaymentData::from($item))?->values()?->all() : null,
         );
     }

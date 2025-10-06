@@ -1,3 +1,4 @@
+import { AgriculturalBackground } from '@/components/ui/agricultural-background';
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -22,36 +23,41 @@ export default function CustomerLayout({ children, title, icon: Icon = Package, 
     return (
         <>
             {title && <Head title={title} />}
-            <div className='min-h-screen bg-gradient-to-br from-background via-background to-accent/10'>
+            <div className='min-h-screen'>
                 <header className='sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm'>
                     <div className='container mx-auto flex items-center justify-between p-4'>
                         <div className='flex items-center gap-3'>
                             {backLink && (
                                 <>
-                                    <Link href={backLink} className='flex items-center gap-2 text-primary hover:text-primary/80'>
+                                    <Link
+                                        href={backLink}
+                                        className='flex items-center gap-2 text-emerald-600 transition-colors hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300'
+                                    >
                                         <ArrowLeft className='h-5 w-5' />
                                         <span className='hidden sm:inline'>{backLabel}</span>
                                     </Link>
                                     <Separator orientation='vertical' className='h-6' />
                                 </>
                             )}
-                            <Icon className='h-8 w-8 text-primary' />
-                            <h1 className='text-2xl font-bold text-primary'>{pageTitle || title || 'E-Catalog Pertanian'}</h1>
+                            <Icon className='h-8 w-8 text-emerald-600 dark:text-emerald-400' />
+                            <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
+                                {pageTitle || title || 'E-Catalog Pertanian'}
+                            </h1>
                         </div>
                         <nav className='flex items-center gap-3'>
                             <Button asChild variant='ghost' size='icon'>
                                 <AnimatedThemeToggler />
                             </Button>
                             {auth.user ? (
-                                <Button asChild variant='outline'>
+                                <Button asChild variant='agricultural-outline'>
                                     <Link href={dashboard()}>Dashboard</Link>
                                 </Button>
                             ) : (
                                 <>
-                                    <Button asChild variant='outline'>
+                                    <Button asChild variant='agricultural-outline'>
                                         <Link href={login()}>Log in</Link>
                                     </Button>
-                                    <Button asChild>
+                                    <Button asChild variant='agricultural'>
                                         <Link href={register()}>Register</Link>
                                     </Button>
                                 </>
@@ -60,7 +66,9 @@ export default function CustomerLayout({ children, title, icon: Icon = Package, 
                     </div>
                 </header>
 
-                <main className='container mx-auto p-6'>{children}</main>
+                <AgriculturalBackground variant='subtle'>
+                    <main className='container mx-auto p-6'>{children}</main>
+                </AgriculturalBackground>
             </div>
         </>
     );
