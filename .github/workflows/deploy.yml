@@ -25,9 +25,12 @@ jobs:
             echo "🔧 Fixing git ownership..."
             sudo git config --global --add safe.directory /var/www/farmhub
 
-            # Pull latest changes
+            # Stash any local changes and force pull
             echo "🔄 Pulling latest changes from GitHub..."
-            git pull origin main
+            git stash --include-untracked || true
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
             # Install/Update Composer dependencies
             echo "📦 Installing/Updating Composer dependencies..."
@@ -35,6 +38,8 @@ jobs:
 
             # Install/Update NPM dependencies
             echo "📦 Installing/Updating NPM dependencies..."
+            rm -f package-lock.json
+            npm install
             npm ci
 
             # Create production .env file from secret

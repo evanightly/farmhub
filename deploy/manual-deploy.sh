@@ -18,10 +18,12 @@ sudo git config --global --add safe.directory /var/www/farmhub
 echo "📋 Current commit:"
 git log --oneline -1
 
-# Pull latest changes
+# Stash any local changes and force pull
 echo "🔄 Pulling latest changes from GitHub..."
+git stash --include-untracked || true
 git fetch origin main
 git reset --hard origin/main
+git clean -fd
 
 # Check new commit
 echo "📋 New commit:"
@@ -33,6 +35,8 @@ COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
 
 # Install/Update NPM dependencies
 echo "📦 Installing/Updating NPM dependencies..."
+rm -f package-lock.json
+npm install
 npm ci
 
 # Clear all caches
