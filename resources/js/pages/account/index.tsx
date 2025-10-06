@@ -19,7 +19,7 @@ interface Props {
 export default function Index({ items, filters }: Props) {
     const handleDelete = (id?: number) => {
         if (!id) return;
-        if (!confirm('Are you sure you want to delete this account?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus akun ini?')) return;
         router.delete(AccountController.destroy(id));
     };
 
@@ -50,11 +50,11 @@ export default function Index({ items, filters }: Props) {
     const formatAccountType = (type: string) => {
         switch (type) {
             case 'bank_transfer':
-                return 'Bank Transfer';
+                return 'Transfer Bank';
             case 'e_wallet':
                 return 'E-Wallet';
             case 'cash':
-                return 'Cash';
+                return 'Tunai';
             default:
                 return type;
         }
@@ -69,19 +69,19 @@ export default function Index({ items, filters }: Props) {
                 return account.account_logo ? (
                     <img
                         src={`/storage/${account.account_logo}`}
-                        alt={account.account_name || 'Account logo'}
+                        alt={account.account_name || 'Logo akun'}
                         className='h-8 w-8 rounded object-cover'
                     />
                 ) : (
                     <div className='flex h-8 w-8 items-center justify-center rounded bg-gray-100'>
-                        <span className='text-xs text-gray-500'>N/A</span>
+                        <span className='text-xs text-gray-500'>T/A</span>
                     </div>
                 );
             },
         },
         {
             id: 'account_name',
-            header: 'Account Name',
+            header: 'Nama Akun',
             accessorKey: 'account_name',
             enableSorting: true,
             cell: ({ row, getValue }) => {
@@ -102,23 +102,23 @@ export default function Index({ items, filters }: Props) {
             enableFiltering: true,
             filter: {
                 type: 'text' as FilterType,
-                placeholder: 'Filter by account name...',
+                placeholder: 'Filter berdasarkan nama akun...',
             },
         },
         {
             id: 'account_no',
-            header: 'Account Number',
+            header: 'Nomor Akun',
             accessorKey: 'account_no',
             enableSorting: true,
             enableFiltering: true,
             filter: {
                 type: 'text' as FilterType,
-                placeholder: 'Filter by account number...',
+                placeholder: 'Filter berdasarkan nomor akun...',
             },
         },
         {
             id: 'account_type',
-            header: 'Type',
+            header: 'Jenis',
             accessorKey: 'account_type',
             enableSorting: true,
             cell: ({ getValue }) => {
@@ -128,11 +128,11 @@ export default function Index({ items, filters }: Props) {
             enableFiltering: true,
             filter: {
                 type: 'select' as FilterType,
-                placeholder: 'Filter by type...',
+                placeholder: 'Filter berdasarkan jenis...',
                 options: [
-                    { label: 'Bank Transfer', value: 'bank_transfer' },
+                    { label: 'Transfer Bank', value: 'bank_transfer' },
                     { label: 'E-Wallet', value: 'e_wallet' },
-                    { label: 'Cash', value: 'cash' },
+                    { label: 'Tunai', value: 'cash' },
                 ],
             },
         },
@@ -143,27 +143,27 @@ export default function Index({ items, filters }: Props) {
             enableSorting: true,
             cell: ({ getValue }) => {
                 const isActive = getValue() as boolean;
-                return <Badge variant={isActive ? 'default' : 'secondary'}>{isActive ? 'Active' : 'Inactive'}</Badge>;
+                return <Badge variant={isActive ? 'default' : 'secondary'}>{isActive ? 'Aktif' : 'Tidak Aktif'}</Badge>;
             },
             enableFiltering: true,
             filter: {
                 type: 'select' as FilterType,
-                placeholder: 'Filter by status...',
+                placeholder: 'Filter berdasarkan status...',
                 options: [
-                    { label: 'Active', value: 'true' },
-                    { label: 'Inactive', value: 'false' },
+                    { label: 'Aktif', value: 'true' },
+                    { label: 'Tidak Aktif', value: 'false' },
                 ],
             },
         },
         {
             id: 'sort_order',
-            header: 'Order',
+            header: 'Urutan',
             accessorKey: 'sort_order',
             enableSorting: true,
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: 'Aksi',
             enableSorting: false,
             cell: ({ row }) => {
                 const account = row.original;
@@ -171,14 +171,14 @@ export default function Index({ items, filters }: Props) {
                     <DropdownMenu.DropdownMenu>
                         <DropdownMenu.DropdownMenuTrigger asChild>
                             <Button variant='agricultural-ghost' className='h-8 w-8 p-0'>
-                                <span className='sr-only'>Open menu</span>
+                                <span className='sr-only'>Buka menu</span>
                                 <MoreHorizontal className='h-4 w-4' />
                             </Button>
                         </DropdownMenu.DropdownMenuTrigger>
                         <DropdownMenu.DropdownMenuContent align='end'>
-                            <DropdownMenu.DropdownMenuLabel>Actions</DropdownMenu.DropdownMenuLabel>
+                            <DropdownMenu.DropdownMenuLabel>Aksi</DropdownMenu.DropdownMenuLabel>
                             <DropdownMenu.DropdownMenuItem asChild>
-                                <Link href={AccountController.show(account.id!).url}>View Account</Link>
+                                <Link href={AccountController.show(account.id!).url}>Lihat Akun</Link>
                             </DropdownMenu.DropdownMenuItem>
                             <DropdownMenu.DropdownMenuItem asChild>
                                 <Link href={AccountController.edit(account.id!).url}>
@@ -189,7 +189,7 @@ export default function Index({ items, filters }: Props) {
                             <DropdownMenu.DropdownMenuSeparator />
                             <DropdownMenu.DropdownMenuItem onClick={() => handleDelete(account.id)} className='text-destructive'>
                                 <Trash className='mr-2 h-4 w-4' />
-                                Delete
+                                Hapus
                             </DropdownMenu.DropdownMenuItem>
                         </DropdownMenu.DropdownMenuContent>
                     </DropdownMenu.DropdownMenu>
@@ -205,22 +205,22 @@ export default function Index({ items, filters }: Props) {
 
     return (
         <AppLayout>
-            <Head title='Account Management' />
+            <Head title='Manajemen Akun' />
 
             {/* Page Header */}
             <div className='container mx-auto py-8'>
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
                         <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                            Account Management
+                            Manajemen Akun
                         </h1>
-                        <p className='text-muted-foreground'>Manage payment accounts for your e-catalog</p>
+                        <p className='text-muted-foreground'>Kelola akun pembayaran untuk e-katalog Anda</p>
                     </div>
                     <div className='flex items-center gap-2'>
                         <Button asChild variant='agricultural'>
                             <Link href={AccountController.create().url}>
                                 <Plus className='mr-2 h-4 w-4' />
-                                Add Account
+                                Tambah Akun
                             </Link>
                         </Button>
                     </div>
@@ -228,21 +228,21 @@ export default function Index({ items, filters }: Props) {
             </div>
 
             <DataTable
-                title='Accounts'
+                title='Akun'
                 data={items.data}
                 columns={columns}
                 pagination={items}
-                searchPlaceholder='Search accounts...'
+                searchPlaceholder='Cari akun...'
                 enableSearch={true}
                 enableColumnFilters={true}
                 enableMultiSort={true}
                 routeFunction={AccountController.index}
                 resetRoute={AccountController.index().url}
-                emptyMessage='No accounts found'
+                emptyMessage='Tidak ada akun ditemukan'
                 emptyDescription={
                     filters.search
-                        ? 'No accounts match your search criteria. Try adjusting your filters.'
-                        : 'Get started by creating your first account.'
+                        ? 'Tidak ada akun yang sesuai dengan kriteria pencarian Anda. Coba sesuaikan filter Anda.'
+                        : 'Mulai dengan membuat akun pertama Anda.'
                 }
             />
         </AppLayout>

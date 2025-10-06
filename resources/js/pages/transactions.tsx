@@ -118,10 +118,10 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
                         <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                            {isAdminOrEmployee ? 'All Transactions' : 'Your Transactions'}
+                            {isAdminOrEmployee ? 'Semua Transaksi' : 'Transaksi Anda'}
                         </h1>
                         <p className='text-muted-foreground'>
-                            {isAdminOrEmployee ? 'Manage and monitor all customer transactions' : 'View your order history and transaction details'}
+                            {isAdminOrEmployee ? 'Kelola dan pantau semua transaksi pelanggan' : 'Lihat riwayat pesanan dan detail transaksi Anda'}
                         </p>
                     </div>
                 </div>
@@ -133,27 +133,27 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                     <Card.CardHeader>
                         <Card.CardTitle className='flex items-center gap-2'>
                             <Search className='h-5 w-5' />
-                            Search Customer Orders
+                            Cari Pesanan Pelanggan
                         </Card.CardTitle>
-                        <Card.CardDescription>Enter any email address to find order history</Card.CardDescription>
+                        <Card.CardDescription>Masukkan alamat email untuk mencari riwayat pesanan</Card.CardDescription>
                     </Card.CardHeader>
                     <Card.CardContent>
                         <form onSubmit={handleSearch} className='flex gap-4'>
                             <div className='flex-1'>
                                 <Label htmlFor='email' className='sr-only'>
-                                    Email Address
+                                    Alamat Email
                                 </Label>
                                 <Input
                                     id='email'
                                     type='email'
-                                    placeholder='Enter email address to search'
+                                    placeholder='Masukkan alamat email untuk mencari'
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
                             </div>
                             <Button type='submit' disabled={isSearching || !email?.trim()} variant='agricultural'>
-                                {isSearching ? 'Searching...' : 'Search Orders'}
+                                {isSearching ? 'Mencari...' : 'Cari Pesanan'}
                             </Button>
                         </form>
                     </Card.CardContent>
@@ -166,9 +166,9 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                     <Card.CardHeader>
                         <Card.CardTitle className='flex items-center gap-2'>
                             <Package className='h-5 w-5' />
-                            Your Order History
+                            Riwayat Pesanan Anda
                         </Card.CardTitle>
-                        <Card.CardDescription>All your orders are automatically displayed below</Card.CardDescription>
+                        <Card.CardDescription>Semua pesanan Anda ditampilkan secara otomatis di bawah ini</Card.CardDescription>
                     </Card.CardHeader>
                 </Card.Card>
             )}
@@ -178,17 +178,17 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <Card.Card variant='agricultural-glass'>
                     <Card.CardContent className='py-12 text-center'>
                         <Search className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
-                        <h3 className='mb-2 text-lg font-medium'>Login Required</h3>
-                        <p className='mb-4 text-muted-foreground'>Please log in to view your transaction history.</p>
+                        <h3 className='mb-2 text-lg font-medium'>Diperlukan Login</h3>
+                        <p className='mb-4 text-muted-foreground'>Silakan masuk untuk melihat riwayat transaksi Anda.</p>
                         <p className='mb-6 text-sm text-muted-foreground'>
-                            If you have a QR code from your order, you can scan it to view specific order details.
+                            Jika Anda memiliki kode QR dari pesanan, Anda dapat memindainya untuk melihat detail pesanan tertentu.
                         </p>
                         <div className='flex justify-center gap-3'>
                             <Button asChild variant='agricultural'>
-                                <Link href={login()}>Log In</Link>
+                                <Link href={login()}>Masuk</Link>
                             </Button>
                             <Button asChild variant='agricultural-outline'>
-                                <Link href={home()}>Continue Shopping</Link>
+                                <Link href={home()}>Lanjutkan Berbelanja</Link>
                             </Button>
                         </div>
                     </Card.CardContent>
@@ -199,9 +199,9 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
                         <h2 className='text-lg font-semibold'>
-                            {isAdminOrEmployee ? `Orders (${orders.length} found)` : `Your Orders (${orders.length} found)`}
+                            {isAdminOrEmployee ? `Pesanan (${orders.length} ditemukan)` : `Pesanan Anda (${orders.length} ditemukan)`}
                         </h2>
-                        {searchEmail && <p className='text-sm text-muted-foreground'>Showing orders for {searchEmail}</p>}
+                        {searchEmail && <p className='text-sm text-muted-foreground'>Menampilkan pesanan untuk {searchEmail}</p>}
                     </div>
 
                     <div className='grid gap-4'>
@@ -211,7 +211,7 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                                     <div className='flex items-start justify-between'>
                                         <div className='space-y-2'>
                                             <div className='flex items-center gap-3'>
-                                                <h3 className='font-semibold'>Order #{order.id}</h3>
+                                                <h3 className='font-semibold'>Pesanan #{order.id}</h3>
                                                 <Badge variant='outline' className={getStatusColor(order.status)}>
                                                     {getStatusIcon(order.status)}
                                                     <span className='ml-1 capitalize'>{order.status}</span>
@@ -241,7 +241,7 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                                         <Button asChild variant='agricultural-outline' size='sm'>
                                             <Link href={OrderController.show(order.id)}>
                                                 <Eye className='mr-2 h-4 w-4' />
-                                                View Details
+                                                Lihat Detail
                                             </Link>
                                         </Button>
                                     </div>
@@ -252,7 +252,7 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
 
                     <div className='text-center'>
                         <Button asChild variant='agricultural-outline'>
-                            <Link href={home()}>Continue Shopping</Link>
+                            <Link href={home()}>Lanjutkan Berbelanja</Link>
                         </Button>
                     </div>
                 </div>
@@ -260,11 +260,11 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <Card.Card variant='agricultural-glass'>
                     <Card.CardContent className='py-12 text-center'>
                         <Package className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
-                        <h3 className='mb-2 text-lg font-medium'>No orders found</h3>
-                        <p className='mb-4 text-muted-foreground'>We could not find any orders for {searchEmail}.</p>
-                        <p className='mb-6 text-sm text-muted-foreground'>Double-check your email address or try a different email.</p>
+                        <h3 className='mb-2 text-lg font-medium'>Tidak ada pesanan ditemukan</h3>
+                        <p className='mb-4 text-muted-foreground'>Kami tidak dapat menemukan pesanan untuk {searchEmail}.</p>
+                        <p className='mb-6 text-sm text-muted-foreground'>Periksa kembali alamat email Anda atau coba email yang berbeda.</p>
                         <Button asChild variant='agricultural'>
-                            <Link href={home()}>Start Shopping</Link>
+                            <Link href={home()}>Mulai Berbelanja</Link>
                         </Button>
                     </Card.CardContent>
                 </Card.Card>
@@ -272,14 +272,14 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <Card.Card variant='agricultural-glass'>
                     <Card.CardContent className='py-12 text-center'>
                         <Package className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
-                        <h3 className='mb-2 text-lg font-medium'>No orders found</h3>
+                        <h3 className='mb-2 text-lg font-medium'>Tidak ada pesanan ditemukan</h3>
                         <p className='mb-6 text-muted-foreground'>
                             {isAdminOrEmployee
-                                ? 'No orders found in the system. Orders will appear here once customers start making purchases.'
-                                : "You haven't placed any orders yet. Start shopping to see your order history here."}
+                                ? 'Tidak ada pesanan ditemukan dalam sistem. Pesanan akan muncul di sini setelah pelanggan mulai melakukan pembelian.'
+                                : 'Anda belum melakukan pesanan apapun. Mulai berbelanja untuk melihat riwayat pesanan Anda di sini.'}
                         </p>
                         <Button asChild variant='agricultural'>
-                            <Link href={home()}>Start Shopping</Link>
+                            <Link href={home()}>Mulai Berbelanja</Link>
                         </Button>
                     </Card.CardContent>
                 </Card.Card>
@@ -287,10 +287,10 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
                 <Card.Card variant='agricultural-glass'>
                     <Card.CardContent className='py-12 text-center'>
                         <Search className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
-                        <h3 className='mb-2 text-lg font-medium'>Ready to find your orders?</h3>
-                        <p className='mb-6 text-muted-foreground'>Enter your email address above to search for your order history.</p>
+                        <h3 className='mb-2 text-lg font-medium'>Siap mencari pesanan Anda?</h3>
+                        <p className='mb-6 text-muted-foreground'>Masukkan alamat email Anda di atas untuk mencari riwayat pesanan.</p>
                         <Button asChild variant='agricultural-outline'>
-                            <Link href={home()}>Browse Products</Link>
+                            <Link href={home()}>Jelajahi Produk</Link>
                         </Button>
                     </Card.CardContent>
                 </Card.Card>
@@ -301,7 +301,7 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
     // Return different layouts based on authentication status
     if (!isAuthenticated) {
         return (
-            <CustomerLayout title='Transaction History' pageTitle='Transaction History' icon={Search}>
+            <CustomerLayout title='Riwayat Transaksi' pageTitle='Riwayat Transaksi' icon={Search}>
                 {renderContent()}
             </CustomerLayout>
         );
@@ -309,8 +309,8 @@ export default function TransactionList({ orders, searchEmail = '', isAdmin = fa
 
     return (
         <AppLayout>
-            <Head title='Transactions' />
-            <div className='container mx-auto space-y-8 pb-8'>{renderContent()}</div>
+            <Head title='Transaksi' />
+            <div className='container mx-auto space-y-8 py-8'>{renderContent()}</div>
         </AppLayout>
     );
 }

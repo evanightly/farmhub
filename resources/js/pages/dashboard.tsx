@@ -36,7 +36,7 @@ export default function Dashboard() {
                                 <div className='space-y-2'>
                                     <p className='text-sm font-medium text-slate-600 dark:text-slate-400'>Total Revenue</p>
                                     <p className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                        $45,231
+                                        Rp 672.000.000
                                     </p>
                                     <div className='flex items-center gap-2'>
                                         <Badge className='border-emerald-200 bg-emerald-100 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'>

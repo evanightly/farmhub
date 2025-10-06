@@ -121,13 +121,13 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
     const columns = [
         {
             id: 'id',
-            header: 'Order ID',
+            header: 'ID Pesanan',
             accessorKey: 'id',
             cell: ({ row }: any) => <span className='font-medium'>#{row.original.id}</span>,
         },
         {
             id: 'customer',
-            header: 'Customer',
+            header: 'Pelanggan',
             accessorKey: 'customer_name',
             cell: ({ row }: any) => (
                 <div>
@@ -155,11 +155,11 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                         </div>
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value='pending'>Pending</SelectItem>
-                        <SelectItem value='confirmed'>Confirmed</SelectItem>
-                        <SelectItem value='shipped'>Shipped</SelectItem>
-                        <SelectItem value='delivered'>Delivered</SelectItem>
-                        <SelectItem value='cancelled'>Cancelled</SelectItem>
+                        <SelectItem value='pending'>Menunggu</SelectItem>
+                        <SelectItem value='confirmed'>Dikonfirmasi</SelectItem>
+                        <SelectItem value='shipped'>Dikirim</SelectItem>
+                        <SelectItem value='delivered'>Diterima</SelectItem>
+                        <SelectItem value='cancelled'>Dibatalkan</SelectItem>
                     </SelectContent>
                 </Select>
             ),
@@ -167,17 +167,17 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                 type: 'select',
                 valueMapKey: 'status',
                 valueMap: {
-                    pending: 'Pending',
-                    confirmed: 'Confirmed',
-                    shipped: 'Shipped',
-                    delivered: 'Delivered',
-                    cancelled: 'Cancelled',
+                    pending: 'Menunggu',
+                    confirmed: 'Dikonfirmasi',
+                    shipped: 'Dikirim',
+                    delivered: 'Diterima',
+                    cancelled: 'Dibatalkan',
                 },
             },
         },
         {
             id: 'payment_status',
-            header: 'Payment',
+            header: 'Pembayaran',
             accessorKey: 'payment_status',
             cell: ({ row }: any) => (
                 <Badge variant='outline' className={`${getPaymentStatusColor(row.original.payment_status)}`}>
@@ -189,15 +189,15 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                 type: 'select',
                 valueMapKey: 'payment_status',
                 valueMap: {
-                    unpaid: 'Unpaid',
-                    paid: 'Paid',
-                    verified: 'Verified',
+                    unpaid: 'Belum Dibayar',
+                    paid: 'Dibayar',
+                    verified: 'Terverifikasi',
                 },
             },
         },
         {
             id: 'payment_proof',
-            header: 'Proof',
+            header: 'Bukti',
             cell: ({ row }: any) => (
                 <div className='flex items-center gap-1'>
                     {row.original.payment?.proof_image_path ? (
@@ -209,24 +209,24 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                             </Dialog.DialogTrigger>
                             <Dialog.DialogContent className='max-w-2xl'>
                                 <Dialog.DialogHeader>
-                                    <Dialog.DialogTitle>Payment Proof - Order #{row.original.id}</Dialog.DialogTitle>
-                                    <Dialog.DialogDescription>Customer: {row.original.customer_name}</Dialog.DialogDescription>
+                                    <Dialog.DialogTitle>Bukti Pembayaran - Pesanan #{row.original.id}</Dialog.DialogTitle>
+                                    <Dialog.DialogDescription>Pelanggan: {row.original.customer_name}</Dialog.DialogDescription>
                                 </Dialog.DialogHeader>
                                 <div className='space-y-4'>
                                     <img
                                         src={`/storage/${row.original.payment.proof_image_path}`}
-                                        alt='Payment proof'
+                                        alt='Bukti pembayaran'
                                         className='max-h-96 w-full rounded-lg border object-contain'
                                     />
                                     {row.original.payment.reference_number && (
                                         <div className='rounded-lg bg-muted p-3'>
-                                            <p className='text-sm font-medium'>Reference Number:</p>
+                                            <p className='text-sm font-medium'>Nomor Referensi:</p>
                                             <p className='font-mono text-sm'>{row.original.payment.reference_number}</p>
                                         </div>
                                     )}
                                     {row.original.payment.notes && (
                                         <div className='rounded-lg bg-muted p-3'>
-                                            <p className='text-sm font-medium'>Customer Notes:</p>
+                                            <p className='text-sm font-medium'>Catatan Pelanggan:</p>
                                             <p className='text-sm'>{row.original.payment.notes}</p>
                                         </div>
                                     )}
@@ -241,7 +241,7 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
         },
         {
             id: 'created_at',
-            header: 'Date',
+            header: 'Tanggal',
             accessorKey: 'created_at',
             cell: ({ row }: any) => <span className='text-sm'>{formatDate(row.original.created_at)}</span>,
             filterMeta: {
@@ -252,7 +252,7 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: 'Aksi',
             cell: ({ row }: any) => (
                 <div className='flex gap-2'>
                     <Button asChild size='sm' variant='agricultural-outline'>
@@ -272,22 +272,22 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
                         <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                            Order Management
+                            Manajemen Pesanan
                         </h1>
-                        <p className='text-muted-foreground'>Manage customer orders and update order statuses</p>
+                        <p className='text-muted-foreground'>Kelola pesanan pelanggan dan perbarui status pesanan</p>
                     </div>
                 </div>
             </div>
 
             <DataTable
-                title='Orders'
+                title='Pesanan'
                 data={orders.data}
                 columns={columns}
                 pagination={orders.meta as any}
                 filters={filters.filter || {}}
-                searchPlaceholder='Search orders by ID, customer name, or email...'
-                emptyMessage='No orders found'
-                emptyDescription='Orders will appear here once customers start placing them.'
+                searchPlaceholder='Cari pesanan berdasarkan ID, nama pelanggan, atau email...'
+                emptyMessage='Tidak ada pesanan ditemukan'
+                emptyDescription='Pesanan akan muncul di sini setelah pelanggan mulai memesan.'
                 routeFunction={() => ({ url: '/admin/orders', method: 'GET' })}
                 resetRoute='/admin/orders'
             />

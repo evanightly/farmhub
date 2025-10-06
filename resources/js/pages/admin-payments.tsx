@@ -75,13 +75,13 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
     const columns = [
         {
             id: 'order_id',
-            header: 'Order ID',
+            header: 'ID Pesanan',
             accessorKey: 'order_id',
             cell: ({ row }: any) => <span className='font-medium'>#{row.original.order_id}</span>,
         },
         {
             id: 'customer',
-            header: 'Customer',
+            header: 'Pelanggan',
             cell: ({ row }: any) => (
                 <div>
                     <p className='font-medium'>{row.original.order?.customer_name}</p>
@@ -91,13 +91,13 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
         },
         {
             id: 'amount',
-            header: 'Amount',
+            header: 'Jumlah',
             accessorKey: 'amount',
             cell: ({ row }: any) => <span className='font-medium'>{formatPrice(row.original.amount)}</span>,
         },
         {
             id: 'payment_method',
-            header: 'Method',
+            header: 'Metode',
             accessorKey: 'payment_method',
             cell: ({ row }: any) => (
                 <Badge variant='outline'>
@@ -108,19 +108,19 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
         },
         {
             id: 'payment_date',
-            header: 'Payment Date',
+            header: 'Tanggal Pembayaran',
             accessorKey: 'payment_date',
             cell: ({ row }: any) => <span className='text-sm'>{formatDate(row.original.payment_date)}</span>,
         },
         {
             id: 'reference_number',
-            header: 'Reference',
+            header: 'Referensi',
             accessorKey: 'reference_number',
             cell: ({ row }: any) => <span className='font-mono text-sm'>{row.original.reference_number || '-'}</span>,
         },
         {
             id: 'actions',
-            header: 'Actions',
+            header: 'Aksi',
             cell: ({ row }: any) => (
                 <div className='flex gap-2'>
                     {row.original.proof_image_path && (
@@ -132,31 +132,31 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                             </Dialog.DialogTrigger>
                             <Dialog.DialogContent className='max-w-3xl'>
                                 <Dialog.DialogHeader>
-                                    <Dialog.DialogTitle>Payment Proof</Dialog.DialogTitle>
+                                    <Dialog.DialogTitle>Bukti Pembayaran</Dialog.DialogTitle>
                                     <Dialog.DialogDescription>
-                                        Order #{row.original.order_id} - {row.original.order?.customer_name}
+                                        Pesanan #{row.original.order_id} - {row.original.order?.customer_name}
                                     </Dialog.DialogDescription>
                                 </Dialog.DialogHeader>
                                 <div className='space-y-4'>
                                     <img
                                         src={`/storage/${row.original.proof_image_path}`}
-                                        alt='Payment proof'
+                                        alt='Bukti pembayaran'
                                         className='max-h-96 w-full rounded-lg border object-contain'
                                     />
                                     {row.original.notes && (
                                         <div className='rounded-lg bg-muted p-3'>
-                                            <p className='text-sm font-medium'>Customer Notes:</p>
+                                            <p className='text-sm font-medium'>Catatan Pelanggan:</p>
                                             <p className='text-sm text-muted-foreground'>{row.original.notes}</p>
                                         </div>
                                     )}
                                     <div className='flex justify-end gap-2'>
                                         <Button variant='agricultural-outline' onClick={() => handleVerifyPayment(row.original, 'reject')}>
                                             <XCircle className='mr-2 h-4 w-4' />
-                                            Reject
+                                            Tolak
                                         </Button>
                                         <Button variant='agricultural' onClick={() => handleVerifyPayment(row.original, 'approve')}>
                                             <CheckCircle className='mr-2 h-4 w-4' />
-                                            Approve
+                                            Setujui
                                         </Button>
                                     </div>
                                 </div>
@@ -181,22 +181,22 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
                         <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                            Payment Verification
+                            Verifikasi Pembayaran
                         </h1>
-                        <p className='text-muted-foreground'>Review and verify customer payment proofs</p>
+                        <p className='text-muted-foreground'>Tinjau dan verifikasi bukti pembayaran pelanggan</p>
                     </div>
                 </div>
             </div>
 
             <DataTable
-                title='Payments'
+                title='Pembayaran'
                 data={payments.data}
                 columns={columns}
                 pagination={payments.meta as any}
                 filters={{}}
-                searchPlaceholder='Search payments by order ID, customer name, or reference...'
-                emptyMessage='No pending payments'
-                emptyDescription='Payment proofs requiring verification will appear here.'
+                searchPlaceholder='Cari pembayaran berdasarkan ID pesanan, nama pelanggan, atau referensi...'
+                emptyMessage='Tidak ada pembayaran menunggu'
+                emptyDescription='Bukti pembayaran yang memerlukan verifikasi akan muncul di sini.'
                 routeFunction={() => ({ url: '/admin/payments', method: 'GET' })}
                 resetRoute='/admin/payments'
             />
@@ -205,22 +205,22 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
             <Dialog.Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <Dialog.DialogContent>
                     <Dialog.DialogHeader>
-                        <Dialog.DialogTitle>{data.action === 'approve' ? 'Approve Payment' : 'Reject Payment'}</Dialog.DialogTitle>
+                        <Dialog.DialogTitle>{data.action === 'approve' ? 'Setujui Pembayaran' : 'Tolak Pembayaran'}</Dialog.DialogTitle>
                         <Dialog.DialogDescription>
-                            Order #{selectedPayment?.order_id} - {formatPrice(selectedPayment?.amount || 0)}
+                            Pesanan #{selectedPayment?.order_id} - {formatPrice(selectedPayment?.amount || 0)}
                         </Dialog.DialogDescription>
                     </Dialog.DialogHeader>
                     <div className='space-y-4'>
                         <div className='space-y-2'>
-                            <Label htmlFor='admin_notes'>{data.action === 'approve' ? 'Approval Notes (Optional)' : 'Rejection Reason'}</Label>
+                            <Label htmlFor='admin_notes'>{data.action === 'approve' ? 'Catatan Persetujuan (Opsional)' : 'Alasan Penolakan'}</Label>
                             <Textarea
                                 id='admin_notes'
                                 value={data.admin_notes}
                                 onChange={(e) => setData('admin_notes', e.target.value)}
                                 placeholder={
                                     data.action === 'approve'
-                                        ? 'Add any notes about this approval...'
-                                        : 'Explain why this payment is being rejected...'
+                                        ? 'Tambahkan catatan tentang persetujuan ini...'
+                                        : 'Jelaskan mengapa pembayaran ini ditolak...'
                                 }
                                 rows={3}
                                 required={data.action === 'reject'}
@@ -228,14 +228,14 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                         </div>
                         <div className='flex justify-end gap-2'>
                             <Button variant='outline' onClick={() => setDialogOpen(false)}>
-                                Cancel
+                                Batal
                             </Button>
                             <Button
                                 onClick={submitVerification}
                                 disabled={processing}
                                 variant={data.action === 'approve' ? 'default' : 'destructive'}
                             >
-                                {processing ? 'Processing...' : data.action === 'approve' ? 'Approve Payment' : 'Reject Payment'}
+                                {processing ? 'Memproses...' : data.action === 'approve' ? 'Setujui Pembayaran' : 'Tolak Pembayaran'}
                             </Button>
                         </div>
                     </div>

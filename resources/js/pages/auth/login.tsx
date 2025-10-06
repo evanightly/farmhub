@@ -116,9 +116,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
                         >
-                            Welcome back to your
+                            Selamat datang kembali ke
                             <span className='block bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent'>
-                                Agricultural Hub
+                                Pusat Pertanian Anda
                             </span>
                         </motion.h2>
 
@@ -128,7 +128,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.6 }}
                         >
-                            Access your personalized dashboard, manage your orders, and explore the finest agricultural products from trusted farmers.
+                            Akses dasbor pribadi Anda, kelola pesanan, dan jelajahi produk pertanian terbaik dari petani terpercaya.
                         </motion.p>
 
                         <motion.div
@@ -138,9 +138,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             transition={{ duration: 0.8, delay: 0.8 }}
                         >
                             {[
-                                { icon: Users, text: 'Connect with trusted farmers' },
-                                { icon: Shield, text: 'Secure and reliable platform' },
-                                { icon: Sparkles, text: 'Premium quality products' },
+                                { icon: Users, text: 'Terhubung dengan petani terpercaya' },
+                                { icon: Shield, text: 'Platform aman dan terpercaya' },
+                                { icon: Sparkles, text: 'Produk berkualitas premium' },
                             ].map((feature, index) => (
                                 <motion.div
                                     key={index}
@@ -170,11 +170,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             <CardHeader className='pb-8 text-center'>
                                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}>
                                     <CardTitle className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent'>
-                                        Welcome Back
+                                        Selamat Datang Kembali
                                     </CardTitle>
                                 </motion.div>
                                 <CardDescription className='mt-2 text-base text-gray-600 dark:text-gray-300'>
-                                    Sign in to access your account
+                                    Masuk untuk mengakses akun Anda
                                 </CardDescription>
                             </CardHeader>
 
@@ -200,7 +200,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                 className='space-y-2'
                                             >
                                                 <Label htmlFor='email' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                                                    Email address
+                                                    Alamat Email
                                                 </Label>
                                                 <Input
                                                     id='email'
@@ -210,7 +210,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                     autoFocus
                                                     tabIndex={1}
                                                     autoComplete='email'
-                                                    placeholder='email@example.com'
+                                                    placeholder='email@contoh.com'
                                                     className='h-12 border-gray-200 bg-white/50 focus:border-emerald-500 focus:ring-emerald-500/20 dark:border-gray-700 dark:bg-gray-800/50 dark:focus:border-emerald-400'
                                                 />
                                                 <InputError message={errors.email} />
@@ -224,7 +224,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                             >
                                                 <div className='flex items-center justify-between'>
                                                     <Label htmlFor='password' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-                                                        Password
+                                                        Kata Sandi
                                                     </Label>
                                                     {canResetPassword && (
                                                         <TextLink
@@ -232,7 +232,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                             className='text-sm text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300'
                                                             tabIndex={5}
                                                         >
-                                                            Forgot password?
+                                                            Lupa kata sandi?
                                                         </TextLink>
                                                     )}
                                                 </div>
@@ -243,7 +243,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                     required
                                                     tabIndex={2}
                                                     autoComplete='current-password'
-                                                    placeholder='Enter your password'
+                                                    placeholder='Masukkan kata sandi Anda'
                                                     className='h-12 border-gray-200 bg-white/50 focus:border-emerald-500 focus:ring-emerald-500/20 dark:border-gray-700 dark:bg-gray-800/50 dark:focus:border-emerald-400'
                                                 />
                                                 <InputError message={errors.password} />
@@ -262,7 +262,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                     className='border-gray-300 data-[state=checked]:border-emerald-600 data-[state=checked]:bg-emerald-600 dark:border-gray-600'
                                                 />
                                                 <Label htmlFor='remember' className='text-sm text-gray-600 dark:text-gray-300'>
-                                                    Remember me for 30 days
+                                                    Ingat saya selama 30 hari
                                                 </Label>
                                             </motion.div>
 
@@ -281,10 +281,10 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                     {processing ? (
                                                         <div className='flex items-center space-x-2'>
                                                             <LoaderCircle className='h-4 w-4 animate-spin' />
-                                                            <span>Signing in...</span>
+                                                            <span>Sedang masuk...</span>
                                                         </div>
                                                     ) : (
-                                                        'Sign In'
+                                                        'Masuk'
                                                     )}
                                                 </Button>
                                             </motion.div>
@@ -296,13 +296,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                                 transition={{ duration: 0.5, delay: 0.7 }}
                                             >
                                                 <p className='text-sm text-gray-600 dark:text-gray-400'>
-                                                    Don't have an account?{' '}
+                                                    Belum punya akun?{' '}
                                                     <TextLink
                                                         href={register()}
                                                         tabIndex={6}
                                                         className='font-medium text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300'
                                                     >
-                                                        Create account
+                                                        Buat akun
                                                     </TextLink>
                                                 </p>
                                             </motion.div>

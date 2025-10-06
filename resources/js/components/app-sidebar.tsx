@@ -2,7 +2,6 @@ import AccountController from '@/actions/App/Http/Controllers/AccountController'
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import ProductController from '@/actions/App/Http/Controllers/ProductController';
 import UserController from '@/actions/App/Http/Controllers/UserController';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
@@ -15,37 +14,37 @@ import AppLogo from './app-logo';
 
 const adminNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Dasbor',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'User Management',
+        title: 'Manajemen Pengguna',
         href: UserController.index().url,
         icon: Users,
     },
     {
-        title: 'Products',
+        title: 'Produk',
         href: ProductController.index().url,
         icon: Box,
     },
     {
-        title: 'Order Management',
+        title: 'Manajemen Pesanan',
         href: orders(),
         icon: Package,
     },
     {
-        title: 'Accounts',
+        title: 'Akun',
         href: AccountController.index().url,
         icon: IdCard,
     },
     {
-        title: 'Payment Verification',
+        title: 'Verifikasi Pembayaran',
         href: payments(),
         icon: CreditCard,
     },
     {
-        title: 'Transactions',
+        title: 'Transaksi',
         href: OrderController.transactions().url,
         icon: Receipt,
     },
@@ -53,22 +52,22 @@ const adminNavItems: NavItem[] = [
 
 const employeeNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
+        title: 'Dasbor',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
-        title: 'Order Management',
+        title: 'Manajemen Pesanan',
         href: orders(),
         icon: Package,
     },
     {
-        title: 'Payment Verification',
+        title: 'Verifikasi Pembayaran',
         href: payments(),
         icon: CreditCard,
     },
     {
-        title: 'Transactions',
+        title: 'Transaksi',
         href: OrderController.transactions().url,
         icon: Receipt,
     },
@@ -76,7 +75,7 @@ const employeeNavItems: NavItem[] = [
 
 const customerNavItems: NavItem[] = [
     {
-        title: 'Transactions',
+        title: 'Transaksi',
         href: OrderController.transactions().url,
         icon: Receipt,
     },
@@ -84,12 +83,12 @@ const customerNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
+        title: 'Repositori',
         href: 'https://github.com/laravel/react-starter-kit',
         icon: Folder,
     },
     {
-        title: 'Documentation',
+        title: 'Dokumentasi',
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
@@ -134,7 +133,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter className='border-emerald-200/50 bg-gradient-to-b from-teal-50/50 to-emerald-50/50 dark:border-emerald-800/50 dark:from-teal-950/50 dark:to-emerald-950/50'>
-                <NavFooter items={footerNavItems} className='mt-auto' />
+                {/* <NavFooter items={footerNavItems} className='mt-auto' /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -66,13 +66,13 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
 
     return (
         <>
-            <Head title='Order Confirmation' />
+            <Head title='Konfirmasi Pesanan' />
             <div className='min-h-screen bg-gradient-to-br from-background via-background to-accent/10'>
                 <header className='sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm'>
                     <div className='container mx-auto flex items-center justify-between p-4'>
                         <div className='flex items-center gap-3'>
                             <Leaf className='h-8 w-8 text-primary' />
-                            <h1 className='text-2xl font-bold text-primary'>Order Confirmation</h1>
+                            <h1 className='text-2xl font-bold text-primary'>Konfirmasi Pesanan</h1>
                         </div>
                         <nav className='flex items-center gap-3'>
                             <Button asChild variant='ghost' size='icon'>
@@ -80,15 +80,15 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                             </Button>
                             {auth.user ? (
                                 <Link href={dashboard()} className='btn'>
-                                    Dashboard
+                                    Dasbor
                                 </Link>
                             ) : (
                                 <>
                                     <Button asChild variant='outline'>
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>Masuk</Link>
                                     </Button>
                                     <Button asChild>
-                                        <Link href={register()}>Register</Link>
+                                        <Link href={register()}>Daftar</Link>
                                     </Button>
                                 </>
                             )}
@@ -100,8 +100,10 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                     {/* Success Message */}
                     <div className='mb-8 text-center'>
                         <CheckCircle className='mx-auto mb-4 h-16 w-16 text-green-600' />
-                        <h2 className='mb-2 text-3xl font-bold text-foreground'>Order Placed Successfully!</h2>
-                        <p className='text-lg text-muted-foreground'>Thank you for your order. We'll process it and contact you soon.</p>
+                        <h2 className='mb-2 text-3xl font-bold text-foreground'>Pesanan Berhasil Dibuat!</h2>
+                        <p className='text-lg text-muted-foreground'>
+                            Terima kasih atas pesanan Anda. Kami akan memproses dan menghubungi Anda segera.
+                        </p>
                     </div>
 
                     <div className='grid gap-8 lg:grid-cols-3'>
@@ -112,7 +114,7 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                     <div className='flex items-center justify-between'>
                                         <Card.CardTitle className='flex items-center gap-2'>
                                             <Package className='h-5 w-5' />
-                                            Order #{order.id}
+                                            Pesanan #{order.id}
                                         </Card.CardTitle>
                                         <div className='flex gap-2'>
                                             <span className={`rounded-md border px-2 py-1 text-xs font-medium ${getStatusColor(order.status)}`}>
@@ -127,12 +129,12 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                     </div>
                                     <Card.CardDescription className='flex items-center gap-2'>
                                         <Clock className='h-4 w-4' />
-                                        Placed on {formatDate(order.created_at)}
+                                        Dipesan pada {formatDate(order.created_at)}
                                     </Card.CardDescription>
                                 </Card.CardHeader>
                                 <Card.CardContent>
                                     <div className='space-y-4'>
-                                        <h4 className='font-semibold'>Order Items:</h4>
+                                        <h4 className='font-semibold'>Item Pesanan:</h4>
                                         <div className='space-y-3'>
                                             {order.order_items?.map((item) => (
                                                 <div key={item.id} className='flex items-center justify-between rounded-lg bg-muted/50 p-3'>
@@ -160,7 +162,7 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                             {/* Customer Information */}
                             <Card.Card>
                                 <Card.CardHeader>
-                                    <Card.CardTitle>Customer Information</Card.CardTitle>
+                                    <Card.CardTitle>Informasi Pelanggan</Card.CardTitle>
                                 </Card.CardHeader>
                                 <Card.CardContent className='space-y-4'>
                                     <div className='grid gap-4 sm:grid-cols-2'>
@@ -174,7 +176,7 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                         <div className='space-y-2'>
                                             <Label className='flex items-center gap-2'>
                                                 <Phone className='h-4 w-4' />
-                                                Phone
+                                                Telepon
                                             </Label>
                                             <p className='text-sm font-medium'>{order.customer_phone}</p>
                                         </div>
@@ -182,13 +184,13 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                     <div className='space-y-2'>
                                         <Label className='flex items-center gap-2'>
                                             <MapPin className='h-4 w-4' />
-                                            Shipping Address
+                                            Alamat Pengiriman
                                         </Label>
                                         <p className='text-sm whitespace-pre-line'>{order.shipping_address}</p>
                                     </div>
                                     {order.notes && (
                                         <div className='space-y-2'>
-                                            <Label>Order Notes</Label>
+                                            <Label>Catatan Pesanan</Label>
                                             <p className='text-sm whitespace-pre-line text-muted-foreground'>{order.notes}</p>
                                         </div>
                                     )}
@@ -200,7 +202,7 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                         <div className='lg:col-span-1'>
                             <Card.Card>
                                 <Card.CardHeader>
-                                    <Card.CardTitle>What's Next?</Card.CardTitle>
+                                    <Card.CardTitle>Apa Selanjutnya?</Card.CardTitle>
                                 </Card.CardHeader>
                                 <Card.CardContent className='space-y-4'>
                                     <div className='space-y-3'>
@@ -209,31 +211,33 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                                 1
                                             </div>
                                             <div>
-                                                <p className='font-medium'>Order Confirmation</p>
-                                                <p className='text-sm text-muted-foreground'>We'll send you an email confirmation shortly.</p>
+                                                <p className='font-medium'>Konfirmasi Pesanan</p>
+                                                <p className='text-sm text-muted-foreground'>Kami akan mengirimkan email konfirmasi segera.</p>
                                             </div>
                                         </div>
                                         <div className='flex gap-3'>
                                             <div className='flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs'>2</div>
                                             <div>
-                                                <p className='font-medium'>Payment Instructions</p>
-                                                <p className='text-sm text-muted-foreground'>You'll receive payment details via email or phone.</p>
+                                                <p className='font-medium'>Instruksi Pembayaran</p>
+                                                <p className='text-sm text-muted-foreground'>
+                                                    Anda akan menerima detail pembayaran via email atau telepon.
+                                                </p>
                                             </div>
                                         </div>
                                         <div className='flex gap-3'>
                                             <div className='flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs'>3</div>
                                             <div>
-                                                <p className='font-medium'>Processing</p>
+                                                <p className='font-medium'>Pemrosesan</p>
                                                 <p className='text-sm text-muted-foreground'>
-                                                    We'll prepare your agricultural products for delivery.
+                                                    Kami akan menyiapkan produk pertanian Anda untuk pengiriman.
                                                 </p>
                                             </div>
                                         </div>
                                         <div className='flex gap-3'>
                                             <div className='flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs'>4</div>
                                             <div>
-                                                <p className='font-medium'>Delivery</p>
-                                                <p className='text-sm text-muted-foreground'>Your order will be delivered to your address.</p>
+                                                <p className='font-medium'>Pengiriman</p>
+                                                <p className='text-sm text-muted-foreground'>Pesanan Anda akan dikirim ke alamat Anda.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -244,20 +248,22 @@ export default function OrderSuccess({ order }: OrderSuccessProps) {
                                         <Button asChild className='w-full'>
                                             <Link href={home()}>
                                                 <Leaf className='mr-2 h-4 w-4' />
-                                                Continue Shopping
+                                                Lanjut Berbelanja
                                             </Link>
                                         </Button>
 
                                         {auth.user && (
                                             <Button asChild variant='outline' className='w-full'>
-                                                <Link href={dashboard()}>View My Orders</Link>
+                                                <Link href={dashboard()}>Lihat Pesanan Saya</Link>
                                             </Button>
                                         )}
                                     </div>
 
                                     <div className='rounded-lg bg-muted/50 p-3'>
-                                        <p className='text-sm font-medium'>Need Help?</p>
-                                        <p className='text-sm text-muted-foreground'>Contact us if you have any questions about your order.</p>
+                                        <p className='text-sm font-medium'>Butuh Bantuan?</p>
+                                        <p className='text-sm text-muted-foreground'>
+                                            Hubungi kami jika Anda memiliki pertanyaan tentang pesanan Anda.
+                                        </p>
                                     </div>
                                 </Card.CardContent>
                             </Card.Card>

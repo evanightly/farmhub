@@ -132,19 +132,19 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
     const getAccountTypeName = (type: string) => {
         switch (type) {
             case 'bank_transfer':
-                return 'Bank Transfer';
+                return 'Transfer Bank';
             case 'e_wallet':
-                return 'E-Wallet';
+                return 'Dompet Digital';
             case 'cash':
-                return 'Cash Payment';
+                return 'Pembayaran Tunai';
             default:
-                return 'Payment';
+                return 'Pembayaran';
         }
     };
 
     return (
         <>
-            <Head title='Payment Instructions' />
+            <Head title='Instruksi Pembayaran' />
             <AgriculturalBackground variant='payment' className='print:bg-white'>
                 <header className='sticky top-0 z-50 border-b bg-white/80 shadow-sm backdrop-blur-lg dark:bg-slate-950/80 print:hidden'>
                     <div className='container mx-auto flex items-center justify-between p-4'>
@@ -155,11 +155,11 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                             </div>
                             <div>
                                 <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                    Payment Instructions
+                                    Instruksi Pembayaran
                                 </h1>
                                 <p className='flex items-center gap-1 text-xs text-muted-foreground'>
                                     <Shield className='h-3 w-3' />
-                                    Secure & Protected
+                                    Aman & Terlindungi
                                 </p>
                             </div>
                         </div>
@@ -173,15 +173,15 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                                     className='inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-medium text-white shadow-lg ring-offset-background transition-colors hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
                                 >
                                     <Sparkles className='mr-2 h-4 w-4' />
-                                    Dashboard
+                                    Dasbor
                                 </Link>
                             ) : (
                                 <>
                                     <Button asChild variant='agricultural-outline'>
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>Masuk</Link>
                                     </Button>
                                     <Button asChild variant='agricultural'>
-                                        <Link href={register()}>Register</Link>
+                                        <Link href={register()}>Daftar</Link>
                                     </Button>
                                 </>
                             )}
@@ -192,7 +192,7 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                 {/* Print-only header */}
                 <div className='hidden print:mb-6 print:block'>
                     <div className='border-b-2 border-gray-300 pb-4 text-center'>
-                        <h1 className='text-2xl font-bold text-black'>Payment Instructions</h1>
+                        <h1 className='text-2xl font-bold text-black'>Instruksi Pembayaran</h1>
                         <p className='mt-2 text-lg text-gray-700'>Order #{order.id}</p>
                         <p className='mt-1 text-sm text-gray-600'>Amount: {formatPrice(order.total_amount)}</p>
                     </div>
@@ -205,11 +205,11 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                             <div className='absolute top-0 left-1/2 h-6 w-6 -translate-x-1/2 -translate-y-2 transform animate-ping rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 opacity-60 print:hidden'></div>
                         </div>
                         <h2 className='mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-4xl font-bold text-transparent dark:from-slate-100 dark:to-slate-400 print:text-xl print:text-black'>
-                            Order Created Successfully! 🎉
+                            Pesanan Berhasil Dibuat! 🎉
                         </h2>
                         <p className='mx-auto max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-400 print:text-base print:text-gray-700'>
-                            Your order has been confirmed! Please complete your payment using the secure instructions below to process your
-                            agricultural products order.
+                            Pesanan Anda telah dikonfirmasi! Silakan selesaikan pembayaran menggunakan instruksi di bawah ini untuk memproses pesanan
+                            Anda.
                         </p>
                     </div>
 
@@ -222,9 +222,9 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                             <Card.CardHeader className='text-center'>
                                 <Card.CardTitle className='flex items-center justify-center gap-2 text-xl'>
                                     <QrCode className='h-6 w-6' />
-                                    Scan QR Code for Quick Access
+                                    Pindai Kode QR untuk Akses Cepat
                                 </Card.CardTitle>
-                                <Card.CardDescription>Keep this QR code to easily track your order</Card.CardDescription>
+                                <Card.CardDescription>Simpan kode QR ini untuk melacak pesanan Anda dengan mudah</Card.CardDescription>
                             </Card.CardHeader>
                             <Card.CardContent className='space-y-4 text-center'>
                                 <div className='flex justify-center'>
@@ -235,14 +235,14 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                                     />
                                 </div>
                                 <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3'>
-                                    <p className='text-sm font-medium text-yellow-800'>⚠️ Important: Keep this QR code safe!</p>
+                                    <p className='text-sm font-medium text-yellow-800'>⚠️ Penting: Simpan kode QR ini dengan aman!</p>
                                     <p className='mt-1 text-xs text-yellow-700'>
-                                        This QR code contains a secure access token that allows anyone to view your order details. Do not share it
-                                        with unauthorized persons.
+                                        Kode QR ini berisi token akses aman yang memungkinkan siapa pun melihat detail pesanan Anda. Jangan bagikan
+                                        dengan orang yang tidak berwenang.
                                     </p>
                                 </div>
                                 <div className='text-sm text-muted-foreground'>
-                                    Order Reference: <span className='font-mono font-bold'>#{order.id}</span>
+                                    Referensi Pesanan: <span className='font-mono font-bold'>#{order.id}</span>
                                 </div>
                             </Card.CardContent>
                         </Card.Card>
@@ -256,16 +256,16 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                                 <Card.CardHeader>
                                     <Card.CardTitle className='flex items-center gap-2'>
                                         {getAccountIcon(account.account_type || 'bank_transfer')}
-                                        Payment via {getAccountTypeName(account.account_type || 'bank_transfer')}
+                                        Pembayaran via {getAccountTypeName(account.account_type || 'bank_transfer')}
                                     </Card.CardTitle>
-                                    <Card.CardDescription>Complete your payment using the details below</Card.CardDescription>
+                                    <Card.CardDescription>Selesaikan pembayaran Anda menggunakan detail di bawah ini</Card.CardDescription>
                                 </Card.CardHeader>
                                 <Card.CardContent className='space-y-4'>
                                     {/* Payment Amount */}
                                     <Item variant='outline'>
                                         <ItemContent>
-                                            <ItemTitle className='line-clamp-1'>Amount to Pay</ItemTitle>
-                                            <ItemDescription>Put this exact amount when making the transfer</ItemDescription>
+                                            <ItemTitle className='line-clamp-1'>Jumlah yang Harus Dibayar</ItemTitle>
+                                            <ItemDescription>Masukkan jumlah yang tepat saat melakukan transfer</ItemDescription>
                                         </ItemContent>
                                         <ItemContent className='flex-none text-center'>
                                             <ItemDescription className='text-agricultural-gradient text-2xl font-bold print:text-black'>
@@ -276,7 +276,7 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
 
                                     {/* Account Details */}
                                     <div className='space-y-3'>
-                                        <h4 className='font-semibold'>Account Details</h4>
+                                        <h4 className='font-semibold'>Detail Akun</h4>
 
                                         <ItemGroup className='gap-2'>
                                             <Item size='sm' variant='outline'>
@@ -284,7 +284,7 @@ export default function PaymentInstructions({ order, account, qrCodeDataUri }: P
                                                     <User className='size-4 text-muted-foreground' />
                                                 </ItemMedia>
                                                 <ItemContent>
-                                                    <ItemTitle>Account Name</ItemTitle>
+                                                    <ItemTitle>Nama Akun</ItemTitle>
                                                 </ItemContent>
                                                 <ItemActions>
                                                     {account.account_name}

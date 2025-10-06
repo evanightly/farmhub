@@ -38,24 +38,26 @@ export default function Show({ item }: Props) {
 
     const validateFileSize = (files: File[]) => {
         const errors: string[] = [];
-        let totalSize = 0;
+        const totalSize = files.reduce((sum, file) => sum + file.size, 0);
 
-        files.forEach((file, index) => {
+        // Check individual file sizes
+        files.forEach((file) => {
             if (file.size > MAX_FILE_SIZE) {
-                errors.push(`File ${index + 1} (${file.name}) is too large. Maximum size is ${(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB.`);
+                errors.push(
+                    `Berkas "${file.name}" terlalu besar. Ukuran maksimum yang diizinkan adalah ${(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB.`,
+                );
             }
-            totalSize += file.size;
         });
 
+        // Check total size
         if (totalSize > MAX_TOTAL_SIZE) {
             errors.push(
-                `Total file size (${(totalSize / 1024 / 1024).toFixed(1)}MB) exceeds maximum limit of ${(MAX_TOTAL_SIZE / 1024 / 1024).toFixed(1)}MB.`,
+                `Total ukuran berkas terlalu besar. Ukuran total maksimum yang diizinkan adalah ${(MAX_TOTAL_SIZE / 1024 / 1024).toFixed(1)}MB.`,
             );
         }
 
         return errors;
     };
-
     const unitForm = useForm({
         unit_type: '',
         unit_label: '',
@@ -110,7 +112,7 @@ export default function Show({ item }: Props) {
                 await Promise.all(updatePromises);
             } catch (error: any) {
                 console.error('Error updating unit order:', error);
-                toast.error('Failed to save unit order.');
+                toast.error('Gagal menyimpan urutan unit.');
                 // Revert the change on error
                 setProductUnits(productUnits);
             }
@@ -143,7 +145,7 @@ export default function Show({ item }: Props) {
                 await Promise.all(updatePromises);
             } catch (error: any) {
                 console.error('Error updating image order:', error);
-                toast.error('Failed to save image order.');
+                toast.error('Gagal menyimpan urutan gambar.');
                 // Revert the change on error
                 setProductImages(productImages);
             }
@@ -169,10 +171,10 @@ export default function Show({ item }: Props) {
         try {
             await axios.delete(ProductUnitController.destroy({ product_unit: unitId }).url);
             setProductUnits(productUnits.filter((unit) => unit.id !== unitId));
-            toast.success('Unit deleted successfully!');
+            toast.success('Unit berhasil dihapus!');
         } catch (error: any) {
             console.error('Error deleting unit:', error);
-            toast.error('Failed to delete unit.');
+            toast.error('Gagal menghapus unit.');
         }
     };
 
@@ -180,17 +182,17 @@ export default function Show({ item }: Props) {
         try {
             await axios.delete(ProductImageController.destroy({ product_image: imageId }).url);
             setProductImages(productImages.filter((image) => image.id !== imageId));
-            toast.success('Image deleted successfully!');
+            toast.success('Gambar berhasil dihapus!');
         } catch (error: any) {
             console.error('Error deleting image:', error);
-            toast.error('Failed to delete image.');
+            toast.error('Gagal menghapus gambar.');
         }
     };
 
     const handleAddImage = async () => {
         const files = imageForm.data.images;
         if (files.length === 0) {
-            toast.error('Please select at least one image.');
+            toast.error('Silakan pilih setidaknya satu gambar.');
             return;
         }
 
@@ -227,7 +229,7 @@ export default function Show({ item }: Props) {
                 setProductUnits([...productUnits, response.data]);
                 unitForm.reset();
                 setIsAddUnitOpen(false);
-                toast.success('Unit added successfully!');
+                toast.success('Unit berhasil ditambahkan!');
             }
         } catch (error: any) {
             console.error('Error adding unit:', error);
@@ -238,7 +240,7 @@ export default function Show({ item }: Props) {
                         toast.error(errorMsg);
                     });
             } else {
-                toast.error(error.response?.data?.message || 'Failed to add unit.');
+                toast.error(error.response?.data?.message || 'Gagal menambahkan unit.');
             }
         }
     };
@@ -253,7 +255,7 @@ export default function Show({ item }: Props) {
                 editUnitForm.reset();
                 setIsEditUnitOpen(false);
                 setEditingUnit(null);
-                toast.success('Unit updated successfully!');
+                toast.success('Unit berhasil diperbarui!');
             }
         } catch (error: any) {
             console.error('Error updating unit:', error);
@@ -264,7 +266,7 @@ export default function Show({ item }: Props) {
                         toast.error(errorMsg);
                     });
             } else {
-                toast.error(error.response?.data?.message || 'Failed to update unit.');
+                toast.error(error.response?.data?.message || 'Gagal memperbarui unit.');
             }
         }
     };
@@ -278,11 +280,11 @@ export default function Show({ item }: Props) {
             await axios.put(ProductImageController.update(image.id).url, {
                 alt_text: image.alt_text || '',
             });
-            toast.success('Image alt text updated successfully!');
+            toast.success('Teks alt gambar berhasil diperbarui!');
             setEditingImageIndex(null);
         } catch (error: any) {
             console.error('Error updating image:', error);
-            toast.error(error.response?.data?.message || 'Failed to update image alt text.');
+            toast.error(error.response?.data?.message || 'Gagal memperbarui teks alt gambar.');
         }
     };
 
@@ -302,17 +304,19 @@ export default function Show({ item }: Props) {
                         <Card.CardHeader>
                             <div className='flex items-center justify-between'>
                                 <div>
-                                    <Card.CardTitle>Product Images</Card.CardTitle>
-                                    <Card.CardDescription>Drag to reorder images. The first image will be the primary one.</Card.CardDescription>
+                                    <Card.CardTitle>Gambar Produk</Card.CardTitle>
+                                    <Card.CardDescription>
+                                        Seret untuk mengubah urutan gambar. Gambar pertama akan menjadi gambar utama.
+                                    </Card.CardDescription>
                                 </div>
                                 <Dialog open={isAddImageOpen} onOpenChange={setIsAddImageOpen}>
                                     <DialogTrigger asChild>
-                                        <Button variant='agricultural'>Add Images</Button>
+                                        <Button variant='agricultural'>Tambah Gambar</Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
-                                            <DialogTitle>Add New Images</DialogTitle>
-                                            <DialogDescription>Upload one or more images for this product.</DialogDescription>
+                                            <DialogTitle>Tambah Gambar Baru</DialogTitle>
+                                            <DialogDescription>Unggah satu atau lebih gambar untuk produk ini.</DialogDescription>
                                         </DialogHeader>
                                         <form
                                             onSubmit={(e: React.FormEvent) => {
@@ -322,7 +326,7 @@ export default function Show({ item }: Props) {
                                         >
                                             <div className='grid gap-4 py-4'>
                                                 <div className='grid gap-2'>
-                                                    <Label htmlFor='images'>Images (Multiple files allowed)</Label>
+                                                    <Label htmlFor='images'>Gambar (Beberapa berkas diizinkan)</Label>
                                                     <Input
                                                         id='images'
                                                         type='file'
@@ -336,7 +340,7 @@ export default function Show({ item }: Props) {
                                                         }}
                                                     />
                                                     <p className='text-xs text-muted-foreground'>
-                                                        Maximum {(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB per file,{' '}
+                                                        Maksimum {(MAX_FILE_SIZE / 1024 / 1024).toFixed(1)}MB per berkas,{' '}
                                                         {(MAX_TOTAL_SIZE / 1024 / 1024).toFixed(1)}MB total
                                                     </p>
                                                 </div>
@@ -359,11 +363,11 @@ export default function Show({ item }: Props) {
                                                                     className='line-clamp-2 text-sm font-medium break-all'
                                                                     htmlFor={`alt_text_${index}`}
                                                                 >
-                                                                    Alt text for "{file.name}"
+                                                                    Teks alternatif untuk "{file.name}"
                                                                 </Label>
                                                                 <Input
                                                                     id={`alt_text_${index}`}
-                                                                    placeholder='Describe this image for accessibility'
+                                                                    placeholder='Deskripsikan gambar ini untuk aksesibilitas'
                                                                     value={imageForm.data.alt_texts[index] || ''}
                                                                     onChange={(e) => {
                                                                         const newAltTexts = [...imageForm.data.alt_texts];
@@ -372,7 +376,7 @@ export default function Show({ item }: Props) {
                                                                     }}
                                                                 />
                                                                 <p className='text-xs text-muted-foreground'>
-                                                                    Size: {(file.size / 1024 / 1024).toFixed(2)}MB
+                                                                    Ukuran: {(file.size / 1024 / 1024).toFixed(2)}MB
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -385,12 +389,12 @@ export default function Show({ item }: Props) {
                                                         checked={imageForm.data.is_primary}
                                                         onCheckedChange={(checked) => imageForm.setData('is_primary', checked)}
                                                     />
-                                                    <Label htmlFor='is_primary'>Set first image as primary</Label>
+                                                    <Label htmlFor='is_primary'>Jadikan gambar pertama sebagai utama</Label>
                                                 </div>
                                             </div>
                                             <DialogFooter>
                                                 <Button type='submit' variant='agricultural'>
-                                                    Upload Images
+                                                    Unggah Gambar
                                                 </Button>
                                             </DialogFooter>
                                         </form>
@@ -454,17 +458,17 @@ export default function Show({ item }: Props) {
                     <Card.Card variant='agricultural-glass' className='flex-1'>
                         <Card.CardHeader className='flex flex-row items-center justify-between'>
                             <div>
-                                <Card.CardTitle>Product Units</Card.CardTitle>
-                                <Card.CardDescription>Manage and organize product units</Card.CardDescription>
+                                <Card.CardTitle>Unit Produk</Card.CardTitle>
+                                <Card.CardDescription>Kelola dan atur unit produk</Card.CardDescription>
                             </div>
                             <Dialog open={isAddUnitOpen} onOpenChange={setIsAddUnitOpen}>
                                 <DialogTrigger asChild>
-                                    <Button variant='agricultural'>Add Unit</Button>
+                                    <Button variant='agricultural'>Tambah Unit</Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Add New Unit</DialogTitle>
-                                        <DialogDescription>Create a new unit for this product. The unit will be added to the list.</DialogDescription>
+                                        <DialogTitle>Tambah Unit Baru</DialogTitle>
+                                        <DialogDescription>Buat unit baru untuk produk ini. Unit akan ditambahkan ke daftar.</DialogDescription>
                                     </DialogHeader>
                                     <form
                                         onSubmit={(e: React.FormEvent) => {
@@ -474,12 +478,12 @@ export default function Show({ item }: Props) {
                                     >
                                         <div className='grid gap-4 py-4'>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='unit_type'>Unit Type</Label>
+                                                <Label htmlFor='unit_type'>Jenis Unit</Label>
                                                 <Combobox
                                                     value={unitForm.data.unit_type}
                                                     onValueChange={(value: string) => unitForm.setData('unit_type', value)}
                                                     options={unitTypes}
-                                                    placeholder='Search unit type...'
+                                                    placeholder='Cari jenis unit...'
                                                     allowCustom={true}
                                                     onCreateNew={(newType: string) => {
                                                         setUnitTypes((prev) => [...prev, newType]);
@@ -488,16 +492,16 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='unit_label'>Unit Label</Label>
+                                                <Label htmlFor='unit_label'>Label Unit</Label>
                                                 <Input
                                                     id='unit_label'
                                                     value={unitForm.data.unit_label}
                                                     onChange={(e) => unitForm.setData('unit_label', e.target.value)}
-                                                    placeholder='e.g., Karung (25kg)'
+                                                    placeholder='contoh: Karung (25kg)'
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='price_per_unit'>Price per Unit</Label>
+                                                <Label htmlFor='price_per_unit'>Harga per Unit</Label>
                                                 <Input
                                                     id='price_per_unit'
                                                     type='number'
@@ -506,7 +510,7 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='stock_quantity'>Stock Quantity</Label>
+                                                <Label htmlFor='stock_quantity'>Jumlah Stok</Label>
                                                 <Input
                                                     id='stock_quantity'
                                                     type='number'
@@ -515,12 +519,12 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='notes'>Notes</Label>
+                                                <Label htmlFor='notes'>Catatan</Label>
                                                 <Textarea
                                                     id='notes'
                                                     value={unitForm.data.notes || ''}
                                                     onChange={(e) => unitForm.setData('notes', e.target.value)}
-                                                    placeholder='Any special notes about this unit'
+                                                    placeholder='Catatan khusus tentang unit ini'
                                                 />
                                             </div>
                                             <div className='flex items-center gap-2'>
@@ -529,12 +533,12 @@ export default function Show({ item }: Props) {
                                                     checked={unitForm.data.is_active}
                                                     onCheckedChange={(checked) => unitForm.setData('is_active', checked)}
                                                 />
-                                                <Label htmlFor='is_active'>Active</Label>
+                                                <Label htmlFor='is_active'>Aktif</Label>
                                             </div>
                                         </div>
                                         <DialogFooter>
                                             <Button type='submit' variant='agricultural'>
-                                                Add Unit
+                                                Tambah Unit
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -546,7 +550,7 @@ export default function Show({ item }: Props) {
                                 <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Edit Unit</DialogTitle>
-                                        <DialogDescription>Update the details of this unit.</DialogDescription>
+                                        <DialogDescription>Perbarui detail unit ini.</DialogDescription>
                                     </DialogHeader>
                                     <form
                                         onSubmit={(e: React.FormEvent) => {
@@ -556,12 +560,12 @@ export default function Show({ item }: Props) {
                                     >
                                         <div className='grid gap-4 py-4'>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='edit_unit_type'>Unit Type</Label>
+                                                <Label htmlFor='edit_unit_type'>Jenis Unit</Label>
                                                 <Combobox
                                                     value={editUnitForm.data.unit_type}
                                                     onValueChange={(value: string) => editUnitForm.setData('unit_type', value)}
                                                     options={unitTypes}
-                                                    placeholder='Search unit type...'
+                                                    placeholder='Cari jenis unit...'
                                                     allowCustom={true}
                                                     onCreateNew={(newType: string) => {
                                                         setUnitTypes((prev) => [...prev, newType]);
@@ -570,16 +574,16 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='edit_unit_label'>Unit Label</Label>
+                                                <Label htmlFor='edit_unit_label'>Label Unit</Label>
                                                 <Input
                                                     id='edit_unit_label'
                                                     value={editUnitForm.data.unit_label}
                                                     onChange={(e) => editUnitForm.setData('unit_label', e.target.value)}
-                                                    placeholder='e.g., Karung (25kg)'
+                                                    placeholder='contoh: Karung (25kg)'
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='edit_price_per_unit'>Price per Unit</Label>
+                                                <Label htmlFor='edit_price_per_unit'>Harga per Unit</Label>
                                                 <Input
                                                     id='edit_price_per_unit'
                                                     type='number'
@@ -588,7 +592,7 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='edit_stock_quantity'>Stock Quantity</Label>
+                                                <Label htmlFor='edit_stock_quantity'>Jumlah Stok</Label>
                                                 <Input
                                                     id='edit_stock_quantity'
                                                     type='number'
@@ -597,12 +601,12 @@ export default function Show({ item }: Props) {
                                                 />
                                             </div>
                                             <div className='grid gap-2'>
-                                                <Label htmlFor='edit_notes'>Notes</Label>
+                                                <Label htmlFor='edit_notes'>Catatan</Label>
                                                 <Textarea
                                                     id='edit_notes'
                                                     value={editUnitForm.data.notes || ''}
                                                     onChange={(e) => editUnitForm.setData('notes', e.target.value)}
-                                                    placeholder='Any special notes about this unit'
+                                                    placeholder='Catatan khusus tentang unit ini'
                                                 />
                                             </div>
                                             <div className='flex items-center gap-2'>
@@ -611,7 +615,7 @@ export default function Show({ item }: Props) {
                                                     checked={editUnitForm.data.is_active}
                                                     onCheckedChange={(checked) => editUnitForm.setData('is_active', checked)}
                                                 />
-                                                <Label htmlFor='edit_is_active'>Active</Label>
+                                                <Label htmlFor='edit_is_active'>Aktif</Label>
                                             </div>
                                         </div>
                                         <DialogFooter>
@@ -624,10 +628,10 @@ export default function Show({ item }: Props) {
                                                     editUnitForm.reset();
                                                 }}
                                             >
-                                                Cancel
+                                                Batal
                                             </Button>
                                             <Button type='submit' variant='agricultural'>
-                                                Update Unit
+                                                Perbarui Unit
                                             </Button>
                                         </DialogFooter>
                                     </form>
@@ -655,17 +659,17 @@ export default function Show({ item }: Props) {
                                                         {unit.unit_label} ({unit.unit_type})
                                                         {!unit.is_active && (
                                                             <span className='rounded-full bg-secondary/10 px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
-                                                                Inactive
+                                                                Tidak Aktif
                                                             </span>
                                                         )}
                                                     </ItemTitle>
                                                     <ItemDescription className='flex gap-4'>
                                                         <span className='flex items-center gap-1.5'>
-                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Stock</span>
+                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Stok</span>
                                                             <span className='text-sm font-medium'>{unit.stock_quantity}</span>
                                                         </span>
                                                         <span className='flex items-center gap-1.5'>
-                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Price</span>
+                                                            <span className='text-xs font-medium text-muted-foreground uppercase'>Harga</span>
                                                             <span className='text-sm font-medium'>{unit.formatted_price_per_unit}</span>
                                                         </span>
                                                     </ItemDescription>
@@ -694,8 +698,8 @@ export default function Show({ item }: Props) {
             <Dialog open={editingImageIndex !== null} onOpenChange={(open) => !open && setEditingImageIndex(null)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit Image Alt Text</DialogTitle>
-                        <DialogDescription>Update the accessibility description for this image.</DialogDescription>
+                        <DialogTitle>Edit Teks Alt Gambar</DialogTitle>
+                        <DialogDescription>Perbarui deskripsi aksesibilitas untuk gambar ini.</DialogDescription>
                     </DialogHeader>
                     {editingImageIndex !== null && productImages[editingImageIndex] && (
                         <form
@@ -714,10 +718,10 @@ export default function Show({ item }: Props) {
                                         />
                                     </div>
                                     <div className='flex-1 space-y-2'>
-                                        <Label htmlFor='edit_alt_text'>Alt Text</Label>
+                                        <Label htmlFor='edit_alt_text'>Teks Alt</Label>
                                         <Textarea
                                             id='edit_alt_text'
-                                            placeholder='Describe this image for accessibility'
+                                            placeholder='Deskripsikan gambar ini untuk aksesibilitas'
                                             value={productImages[editingImageIndex].alt_text || ''}
                                             onChange={(e) => {
                                                 setProductImages((prev) =>
@@ -730,10 +734,10 @@ export default function Show({ item }: Props) {
                             </div>
                             <DialogFooter>
                                 <Button type='button' variant='outline' onClick={() => setEditingImageIndex(null)}>
-                                    Cancel
+                                    Batal
                                 </Button>
                                 <Button type='submit' variant='agricultural'>
-                                    Update Alt Text
+                                    Perbarui Teks Alternatif
                                 </Button>
                             </DialogFooter>
                         </form>

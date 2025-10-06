@@ -104,10 +104,10 @@ export default function Register() {
                                     </div>
                                 </motion.div>
                                 <CardTitle className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent'>
-                                    Join FarmHub
+                                    Bergabung dengan FarmHub
                                 </CardTitle>
                                 <CardDescription className='mt-2 text-base text-gray-600 dark:text-gray-300'>
-                                    Create your account and start your agricultural journey
+                                    Buat akun Anda dan mulai perjalanan pertanian
                                 </CardDescription>
                             </CardHeader>
 
@@ -227,10 +227,10 @@ export default function Register() {
                                                     {processing ? (
                                                         <div className='flex items-center space-x-2'>
                                                             <LoaderCircle className='h-4 w-4 animate-spin' />
-                                                            <span>Creating account...</span>
+                                                            <span>Membuat akun...</span>
                                                         </div>
                                                     ) : (
-                                                        'Create Account'
+                                                        'Buat Akun'
                                                     )}
                                                 </Button>
                                             </motion.div>
@@ -242,13 +242,13 @@ export default function Register() {
                                                 transition={{ duration: 0.5, delay: 0.8 }}
                                             >
                                                 <p className='text-sm text-gray-600 dark:text-gray-400'>
-                                                    Already have an account?{' '}
+                                                    Sudah punya akun?{' '}
                                                     <TextLink
                                                         href={login()}
                                                         tabIndex={6}
                                                         className='font-medium text-emerald-600 transition-colors hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300'
                                                     >
-                                                        Sign in
+                                                        Masuk
                                                     </TextLink>
                                                 </p>
                                             </motion.div>

@@ -40,12 +40,12 @@ export default function Edit({ item }: Props) {
 
     return (
         <AppLayout>
-            <Head title='Edit User' />
+            <Head title='Edit Pengguna' />
 
             <div className='container mx-auto py-8'>
                 <div className='mb-8'>
-                    <h1 className='text-3xl font-bold tracking-tight'>Edit User</h1>
-                    <p className='text-muted-foreground'>Update user details</p>
+                    <h1 className='text-3xl font-bold tracking-tight'>Edit Pengguna</h1>
+                    <p className='text-muted-foreground'>Perbarui detail pengguna</p>
                 </div>
 
                 <Card>
@@ -54,7 +54,7 @@ export default function Edit({ item }: Props) {
                             {({ processing, errors }) => (
                                 <div className='grid gap-6'>
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='name'>Name</Label>
+                                        <Label htmlFor='name'>Nama</Label>
                                         <Input id='name' name='name' type='text' defaultValue={item.name} required autoFocus />
                                         <InputError message={errors.name} />
                                     </div>
@@ -66,15 +66,15 @@ export default function Edit({ item }: Props) {
                                     </div>
 
                                     <div className='grid gap-2'>
-                                        <Label htmlFor='role'>Role</Label>
+                                        <Label htmlFor='role'>Peran</Label>
                                         <Select name='role' defaultValue={item.role} required>
                                             <SelectTrigger>
-                                                <SelectValue placeholder='Select a role' />
+                                                <SelectValue placeholder='Pilih peran' />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectItem value='admin'>Admin</SelectItem>
-                                                <SelectItem value='employee'>Employee</SelectItem>
-                                                <SelectItem value='customer'>Customer</SelectItem>
+                                                <SelectItem value='employee'>Karyawan</SelectItem>
+                                                <SelectItem value='customer'>Pelanggan</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <InputError message={errors.role} />
@@ -82,7 +82,7 @@ export default function Edit({ item }: Props) {
 
                                     <div className='grid gap-2'>
                                         <Label htmlFor='password'>
-                                            Password <span className='text-sm text-muted-foreground'>(optional)</span>
+                                            Kata Sandi <span className='text-sm text-muted-foreground'>(opsional)</span>
                                         </Label>
                                         <Input id='password' name='password' type='password' autoComplete='new-password' />
                                         <InputError message={errors.password} />
@@ -90,7 +90,7 @@ export default function Edit({ item }: Props) {
 
                                     <div className='grid gap-2'>
                                         <Label htmlFor='password_confirmation'>
-                                            Confirm Password <span className='text-sm text-muted-foreground'>(optional)</span>
+                                            Konfirmasi Kata Sandi <span className='text-sm text-muted-foreground'>(opsional)</span>
                                         </Label>
                                         <Input id='password_confirmation' name='password_confirmation' type='password' autoComplete='new-password' />
                                         <InputError message={errors.password_confirmation} />
@@ -98,10 +98,10 @@ export default function Edit({ item }: Props) {
 
                                     <div className='flex justify-end gap-4'>
                                         <Button type='button' variant='outline' onClick={() => window.history.back()}>
-                                            Cancel
+                                            Batal
                                         </Button>
                                         <Button type='submit' disabled={processing}>
-                                            {processing ? 'Updating...' : 'Update User'}
+                                            {processing ? 'Memperbarui...' : 'Perbarui Pengguna'}
                                         </Button>
                                     </div>
                                 </div>

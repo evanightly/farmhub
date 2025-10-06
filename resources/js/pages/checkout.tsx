@@ -92,25 +92,25 @@ export default function Checkout({ accounts }: CheckoutProps) {
         const newErrors: Record<string, string> = {};
 
         if (!formData.customer_name.trim()) {
-            newErrors.customer_name = 'Name is required';
+            newErrors.customer_name = 'Nama wajib diisi';
         }
 
         if (!formData.customer_email.trim()) {
-            newErrors.customer_email = 'Email is required';
+            newErrors.customer_email = 'Email wajib diisi';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customer_email)) {
-            newErrors.customer_email = 'Please enter a valid email address';
+            newErrors.customer_email = 'Silakan masukkan alamat email yang valid';
         }
 
         if (!formData.customer_phone.trim()) {
-            newErrors.customer_phone = 'Phone number is required';
+            newErrors.customer_phone = 'Nomor telepon wajib diisi';
         }
 
         if (!formData.shipping_address.trim()) {
-            newErrors.shipping_address = 'Shipping address is required';
+            newErrors.shipping_address = 'Alamat pengiriman wajib diisi';
         }
 
         if (!formData.selected_account_id) {
-            newErrors.selected_account_id = 'Please select a payment method';
+            newErrors.selected_account_id = 'Silakan pilih metode pembayaran';
         }
 
         setErrors(newErrors);
@@ -158,11 +158,11 @@ export default function Checkout({ accounts }: CheckoutProps) {
             router.post(checkout(), orderData, {
                 onSuccess: () => {
                     clearCart();
-                    toast.success('Order placed successfully!');
+                    toast.success('Pesanan berhasil dibuat!');
                 },
                 onError: (errors) => {
                     console.error('Order submission error:', errors);
-                    toast.error('Failed to place order. Please try again.');
+                    toast.error('Gagal membuat pesanan. Silakan coba lagi.');
                     setErrors(errors);
                 },
                 onFinish: () => {
@@ -171,7 +171,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
             });
         } catch (error) {
             console.error('Checkout error:', error);
-            toast.error('An unexpected error occurred. Please try again.');
+            toast.error('Terjadi kesalahan yang tidak terduga. Silakan coba lagi.');
             setIsSubmitting(false);
         }
     };
@@ -196,7 +196,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                 className='flex items-center gap-2 text-emerald-600 transition-colors duration-300 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300'
                             >
                                 <ArrowLeft className='h-5 w-5' />
-                                <span className='hidden font-medium sm:inline'>Back to cart</span>
+                                <span className='hidden font-medium sm:inline'>Kembali ke keranjang</span>
                             </Link>
                             <Separator orientation='vertical' className='h-6' />
                             <div className='relative'>
@@ -205,11 +205,11 @@ export default function Checkout({ accounts }: CheckoutProps) {
                             </div>
                             <div>
                                 <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                    Secure Checkout
+                                    Checkout Aman
                                 </h1>
                                 <p className='flex items-center gap-1 text-xs text-muted-foreground'>
                                     <Shield className='h-3 w-3' />
-                                    Protected & Encrypted
+                                    Terlindungi & Terenkripsi
                                 </p>
                             </div>
                         </div>
@@ -244,12 +244,12 @@ export default function Checkout({ accounts }: CheckoutProps) {
                             ) : (
                                 <>
                                     <Button asChild variant='agricultural-outline'>
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>Masuk</Link>
                                     </Button>
                                     <Button asChild variant='agricultural'>
                                         <Link href={register()}>
                                             <Heart className='mr-2 h-4 w-4' />
-                                            Join Us
+                                            Bergabung
                                         </Link>
                                     </Button>
                                 </>
@@ -267,10 +267,10 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                     <Card.CardHeader>
                                         <Card.CardTitle className='flex items-center gap-2'>
                                             <User className='h-5 w-5' />
-                                            Customer Information
+                                            Informasi Pelanggan
                                         </Card.CardTitle>
                                         <Card.CardDescription>
-                                            Please provide your contact information for order processing and delivery.
+                                            Silakan berikan informasi kontak Anda untuk pemrosesan pesanan dan pengiriman.
                                         </Card.CardDescription>
                                     </Card.CardHeader>
                                     <Card.CardContent className='space-y-4'>
@@ -278,14 +278,14 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                             <div className='space-y-2'>
                                                 <Label htmlFor='customer_name' className='flex items-center gap-2'>
                                                     <User className='h-4 w-4' />
-                                                    Full Name *
+                                                    Nama Lengkap *
                                                 </Label>
                                                 <Input
                                                     id='customer_name'
                                                     name='customer_name'
                                                     value={formData.customer_name}
                                                     onChange={handleInputChange}
-                                                    placeholder='Enter your full name'
+                                                    placeholder='Masukkan nama lengkap Anda'
                                                     className={errors.customer_name ? 'border-destructive' : ''}
                                                 />
                                                 {errors.customer_name && <p className='text-sm text-destructive'>{errors.customer_name}</p>}
@@ -293,7 +293,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                             <div className='space-y-2'>
                                                 <Label htmlFor='customer_email' className='flex items-center gap-2'>
                                                     <Mail className='h-4 w-4' />
-                                                    Email Address *
+                                                    Alamat Email *
                                                 </Label>
                                                 <Input
                                                     id='customer_email'
@@ -301,7 +301,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                                     type='email'
                                                     value={formData.customer_email}
                                                     onChange={handleInputChange}
-                                                    placeholder='Enter your email address'
+                                                    placeholder='Masukkan alamat email Anda'
                                                     className={errors.customer_email ? 'border-destructive' : ''}
                                                 />
                                                 {errors.customer_email && <p className='text-sm text-destructive'>{errors.customer_email}</p>}
@@ -310,7 +310,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                         <div className='space-y-2'>
                                             <Label htmlFor='customer_phone' className='flex items-center gap-2'>
                                                 <Phone className='h-4 w-4' />
-                                                Phone Number *
+                                                Nomor Telepon *
                                             </Label>
                                             <Input
                                                 id='customer_phone'
@@ -318,7 +318,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                                 type='tel'
                                                 value={formData.customer_phone}
                                                 onChange={handleInputChange}
-                                                placeholder='Enter your phone number'
+                                                placeholder='Masukkan nomor telepon Anda'
                                                 className={errors.customer_phone ? 'border-destructive' : ''}
                                             />
                                             {errors.customer_phone && <p className='text-sm text-destructive'>{errors.customer_phone}</p>}
@@ -330,32 +330,32 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                     <Card.CardHeader>
                                         <Card.CardTitle className='flex items-center gap-2'>
                                             <MapPin className='h-5 w-5' />
-                                            Shipping Information
+                                            Informasi Pengiriman
                                         </Card.CardTitle>
-                                        <Card.CardDescription>Where should we deliver your agricultural products?</Card.CardDescription>
+                                        <Card.CardDescription>Ke mana kami harus mengirimkan produk pertanian Anda?</Card.CardDescription>
                                     </Card.CardHeader>
                                     <Card.CardContent className='space-y-4'>
                                         <div className='space-y-2'>
-                                            <Label htmlFor='shipping_address'>Shipping Address *</Label>
+                                            <Label htmlFor='shipping_address'>Alamat Pengiriman *</Label>
                                             <Textarea
                                                 id='shipping_address'
                                                 name='shipping_address'
                                                 value={formData.shipping_address}
                                                 onChange={handleInputChange}
-                                                placeholder='Enter your complete shipping address...'
+                                                placeholder='Masukkan alamat pengiriman lengkap Anda...'
                                                 rows={3}
                                                 className={errors.shipping_address ? 'border-destructive' : ''}
                                             />
                                             {errors.shipping_address && <p className='text-sm text-destructive'>{errors.shipping_address}</p>}
                                         </div>
                                         <div className='space-y-2'>
-                                            <Label htmlFor='notes'>Order Notes (Optional)</Label>
+                                            <Label htmlFor='notes'>Catatan Pesanan (Opsional)</Label>
                                             <Textarea
                                                 id='notes'
                                                 name='notes'
                                                 value={formData.notes}
                                                 onChange={handleInputChange}
-                                                placeholder='Any special instructions or notes for your order...'
+                                                placeholder='Instruksi khusus atau catatan untuk pesanan Anda...'
                                                 rows={2}
                                             />
                                         </div>
@@ -366,9 +366,9 @@ export default function Checkout({ accounts }: CheckoutProps) {
                                     <Card.CardHeader>
                                         <Card.CardTitle className='flex items-center gap-2'>
                                             <CreditCard className='h-5 w-5' />
-                                            Payment Method
+                                            Metode Pembayaran
                                         </Card.CardTitle>
-                                        <Card.CardDescription>Choose your preferred payment method for this order.</Card.CardDescription>
+                                        <Card.CardDescription>Pilih metode pembayaran yang Anda inginkan untuk pesanan ini.</Card.CardDescription>
                                     </Card.CardHeader>
                                     <Card.CardContent className='space-y-4'>
                                         <RadioGroup value={formData.selected_account_id} onValueChange={handleAccountSelection}>

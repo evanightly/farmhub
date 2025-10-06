@@ -17,7 +17,7 @@ interface CustomerLayoutProps {
     backLabel?: string;
 }
 
-export default function CustomerLayout({ children, title, icon: Icon = Package, pageTitle, backLink, backLabel = 'Back' }: CustomerLayoutProps) {
+export default function CustomerLayout({ children, title, icon: Icon = Package, pageTitle, backLink, backLabel = 'Kembali' }: CustomerLayoutProps) {
     const { auth } = usePage<SharedData>().props;
 
     return (
@@ -50,15 +50,15 @@ export default function CustomerLayout({ children, title, icon: Icon = Package, 
                             </Button>
                             {auth.user ? (
                                 <Button asChild variant='agricultural-outline'>
-                                    <Link href={dashboard()}>Dashboard</Link>
+                                    <Link href={dashboard()}>Dasbor</Link>
                                 </Button>
                             ) : (
                                 <>
                                     <Button asChild variant='agricultural-outline'>
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>Masuk</Link>
                                     </Button>
                                     <Button asChild variant='agricultural'>
-                                        <Link href={register()}>Register</Link>
+                                        <Link href={register()}>Daftar</Link>
                                     </Button>
                                 </>
                             )}

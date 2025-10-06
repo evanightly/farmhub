@@ -71,26 +71,26 @@ export default function Edit({ item }: Props) {
                                 </div>
 
                                 <div className='grid gap-2'>
-                                    <Label htmlFor='description'>Description</Label>
+                                    <Label htmlFor='description'>Deskripsi</Label>
                                     <Textarea id='description' name='description' defaultValue={item?.description ?? ''} required />
                                     <InputError message={errors.description} />
                                 </div>
 
                                 <div className='grid gap-2'>
-                                    <Label htmlFor='harvest_date'>Harvest Date</Label>
+                                    <Label htmlFor='harvest_date'>Tanggal Panen</Label>
                                     <Input id='harvest_date' name='harvest_date' type='date' defaultValue={item.harvest_date ?? ''} />
                                     <InputError message={errors.harvest_date} />
                                 </div>
 
                                 <div className='grid gap-2'>
-                                    <Label htmlFor='expiry_date'>Expiry Date</Label>
+                                    <Label htmlFor='expiry_date'>Tanggal Kedaluwarsa</Label>
                                     <Input id='expiry_date' name='expiry_date' type='date' defaultValue={item.expiry_date ?? ''} />
                                     <InputError message={errors.expiry_date} />
                                 </div>
 
                                 <div className='flex justify-end gap-4'>
                                     <Button type='button' variant='outline' onClick={() => window.history.back()}>
-                                        Cancel
+                                        Batal
                                     </Button>
                                     <Button type='submit' disabled={loading}>
                                         {loading ? 'Updating...' : 'Update Product'}

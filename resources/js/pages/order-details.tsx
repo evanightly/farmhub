@@ -76,6 +76,53 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
         });
     };
 
+    const translateStatus = (status: string) => {
+        switch (status) {
+            case 'pending':
+                return 'Menunggu';
+            case 'confirmed':
+                return 'Dikonfirmasi';
+            case 'shipped':
+                return 'Dikirim';
+            case 'delivered':
+                return 'Terkirim';
+            case 'cancelled':
+                return 'Dibatalkan';
+            default:
+                return status;
+        }
+    };
+
+    const translatePaymentStatus = (paymentStatus: string) => {
+        switch (paymentStatus) {
+            case 'unpaid':
+                return 'Belum Dibayar';
+            case 'paid':
+                return 'Dibayar';
+            case 'verified':
+                return 'Terverifikasi';
+            case 'rejected':
+                return 'Ditolak';
+            default:
+                return paymentStatus;
+        }
+    };
+
+    const translatePaymentMethod = (method: string) => {
+        switch (method) {
+            case 'credit_card':
+                return 'Kartu Kredit';
+            case 'bank_transfer':
+                return 'Transfer Bank';
+            case 'cash':
+                return 'Tunai';
+            case 'digital_wallet':
+                return 'Dompet Digital';
+            default:
+                return method?.replace('_', ' ');
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'pending':
@@ -142,11 +189,11 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
 
     return (
         <CustomerLayout
-            title={`Order #${order.id}`}
-            pageTitle={`Order #${order.id}`}
+            title={`Pesanan #${order.id}`}
+            pageTitle={`Pesanan #${order.id}`}
             icon={Package}
             backLink={isQrAccess ? undefined : transactions().url}
-            backLabel={isQrAccess ? undefined : 'Back to transactions'}
+            backLabel={isQrAccess ? undefined : 'Kembali ke transaksi'}
         >
             <div className='grid gap-8 lg:grid-cols-3'>
                 <div className='space-y-6 lg:col-span-2'>
@@ -155,29 +202,29 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                             <div className='flex items-center justify-between'>
                                 <Card.CardTitle className='flex items-center gap-2'>
                                     <Package className='h-5 w-5' />
-                                    Order Status
+                                    Status Pesanan
                                 </Card.CardTitle>
                                 <div className='flex gap-2'>
                                     <Badge variant='outline' className={getStatusColor(order.status)}>
                                         {getStatusIcon(order.status)}
-                                        <span className='ml-1 capitalize'>{order.status}</span>
+                                        <span className='ml-1'>{translateStatus(order.status)}</span>
                                     </Badge>
                                     <Badge variant='outline' className={getPaymentStatusColor(order.payment_status)}>
                                         <CreditCard className='h-3 w-3' />
-                                        <span className='ml-1 capitalize'>{order.payment_status}</span>
+                                        <span className='ml-1'>{translatePaymentStatus(order.payment_status)}</span>
                                     </Badge>
                                 </div>
                             </div>
                             <Card.CardDescription className='flex items-center gap-2'>
                                 <Calendar className='h-4 w-4' />
-                                Placed on {formatDate(order.created_at)}
+                                Dipesan pada {formatDate(order.created_at)}
                             </Card.CardDescription>
                             {isQrAccess && (
                                 <div className='mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3'>
-                                    <p className='text-sm font-medium text-blue-900'>📱 QR Code Access</p>
+                                    <p className='text-sm font-medium text-blue-900'>📱 Akses Kode QR</p>
                                     <p className='mt-1 text-sm text-blue-700'>
-                                        You're viewing this order through a QR code.
-                                        {canUploadPayment && ' You can upload payment proof below.'}
+                                        Anda melihat pesanan ini melalui kode QR.
+                                        {canUploadPayment && ' Anda dapat mengunggah bukti pembayaran di bawah.'}
                                     </p>
                                 </div>
                             )}
@@ -186,7 +233,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
 
                     <Card.Card variant='agricultural-glass'>
                         <Card.CardHeader>
-                            <Card.CardTitle>Order Items</Card.CardTitle>
+                            <Card.CardTitle>Item Pesanan</Card.CardTitle>
                         </Card.CardHeader>
                         <Card.CardContent>
                             <div className='space-y-4'>
@@ -208,7 +255,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                             <Separator className='my-4' />
 
                             <div className='flex items-center justify-between text-lg font-bold'>
-                                <span>Total Amount</span>
+                                <span>Total Jumlah</span>
                                 <span className='text-primary'>{formatPrice(order.total_amount)}</span>
                             </div>
                         </Card.CardContent>
@@ -219,63 +266,63 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                             <Card.CardHeader>
                                 <Card.CardTitle className='flex items-center gap-2'>
                                     <CreditCard className='h-5 w-5' />
-                                    Payment Information
+                                    Informasi Pembayaran
                                 </Card.CardTitle>
                             </Card.CardHeader>
                             <Card.CardContent className='space-y-4'>
                                 <div className='flex items-center justify-between'>
-                                    <span className='text-sm text-muted-foreground'>Payment Method</span>
+                                    <span className='text-sm text-muted-foreground'>Metode Pembayaran</span>
                                     <div className='flex items-center gap-2'>
                                         {getPaymentIcon(order.payment.payment_method || '')}
-                                        <span className='capitalize'>{order.payment.payment_method?.replace('_', ' ')}</span>
+                                        <span>{translatePaymentMethod(order.payment.payment_method || '')}</span>
                                     </div>
                                 </div>
                                 <div className='flex items-center justify-between'>
-                                    <span className='text-sm text-muted-foreground'>Amount</span>
+                                    <span className='text-sm text-muted-foreground'>Jumlah</span>
                                     <span className='font-medium'>{formatPrice(order.payment.amount || 0)}</span>
                                 </div>
                                 {order.payment.payment_date && (
                                     <div className='flex items-center justify-between'>
-                                        <span className='text-sm text-muted-foreground'>Payment Date</span>
+                                        <span className='text-sm text-muted-foreground'>Tanggal Pembayaran</span>
                                         <span>{formatDate(order.payment.payment_date)}</span>
                                     </div>
                                 )}
                                 {order.payment.verified_at && (
                                     <div className='flex items-center justify-between'>
-                                        <span className='text-sm text-muted-foreground'>Verified Date</span>
+                                        <span className='text-sm text-muted-foreground'>Tanggal Verifikasi</span>
                                         <span>{formatDate(order.payment.verified_at)}</span>
                                     </div>
                                 )}
                                 {order.payment.reference_number && (
                                     <div className='flex items-center justify-between'>
-                                        <span className='text-sm text-muted-foreground'>Reference Number</span>
+                                        <span className='text-sm text-muted-foreground'>Nomor Referensi</span>
                                         <span className='font-mono text-sm'>{order.payment.reference_number}</span>
                                     </div>
                                 )}
                                 {order.payment.proof_image_path && (
                                     <div className='space-y-2'>
-                                        <span className='text-sm text-muted-foreground'>Payment Proof</span>
+                                        <span className='text-sm text-muted-foreground'>Bukti Pembayaran</span>
                                         <Dialog.Dialog>
                                             <Dialog.DialogTrigger asChild>
                                                 <Button variant='outline' size='sm' className='w-full'>
                                                     <FileImage className='mr-2 h-4 w-4' />
-                                                    View Payment Proof
+                                                    Lihat Bukti Pembayaran
                                                 </Button>
                                             </Dialog.DialogTrigger>
                                             <Dialog.DialogContent className='max-w-2xl'>
                                                 <Dialog.DialogHeader>
-                                                    <Dialog.DialogTitle>Payment Proof</Dialog.DialogTitle>
-                                                    <Dialog.DialogDescription>Order #{order.id} - Payment Receipt</Dialog.DialogDescription>
+                                                    <Dialog.DialogTitle>Bukti Pembayaran</Dialog.DialogTitle>
+                                                    <Dialog.DialogDescription>Pesanan #{order.id} - Struk Pembayaran</Dialog.DialogDescription>
                                                 </Dialog.DialogHeader>
                                                 <div className='space-y-4'>
                                                     <img
                                                         src={`/storage/${order.payment.proof_image_path}`}
-                                                        alt='Payment proof'
+                                                        alt='Bukti pembayaran'
                                                         className='max-h-96 w-full rounded-lg border object-contain'
                                                     />
                                                     {order.payment.notes && (
                                                         <div className='rounded-lg bg-muted p-3'>
-                                                            <p className='text-sm font-medium'>Notes:</p>
+                                                            <p className='text-sm font-medium'>Catatan:</p>
                                                             <p className='text-sm'>{order.payment.notes}</p>
                                                         </div>
                                                     )}
@@ -294,24 +341,24 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                             <Card.CardHeader>
                                 <Card.CardTitle className='flex items-center gap-2'>
                                     <Upload className='h-5 w-5' />
-                                    Upload Payment Proof
+                                    Unggah Bukti Pembayaran
                                 </Card.CardTitle>
                                 <Card.CardDescription>
                                     {order.payment_status === 'rejected'
-                                        ? 'Your previous payment was rejected. Please upload a new payment proof.'
-                                        : 'Upload your payment proof to complete this order.'}
+                                        ? 'Pembayaran sebelumnya ditolak. Silakan unggah bukti pembayaran baru.'
+                                        : 'Unggah bukti pembayaran Anda untuk menyelesaikan pesanan ini.'}
                                 </Card.CardDescription>
                             </Card.CardHeader>
                             <Card.CardContent>
                                 {!showUploadForm ? (
                                     <Button onClick={() => setShowUploadForm(true)} variant='agricultural' className='w-full'>
                                         <Upload className='mr-2 h-4 w-4' />
-                                        Upload Payment Proof
+                                        Unggah Bukti Pembayaran
                                     </Button>
                                 ) : (
                                     <form onSubmit={handleSubmit} className='space-y-4'>
                                         <div className='space-y-2'>
-                                            <Label htmlFor='proof_image'>Payment Proof Image *</Label>
+                                            <Label htmlFor='proof_image'>Gambar Bukti Pembayaran *</Label>
                                             <Input
                                                 id='proof_image'
                                                 type='file'
@@ -325,11 +372,11 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                                                 required
                                             />
                                             {errors.proof_image && <p className='text-sm text-red-600'>{errors.proof_image}</p>}
-                                            <p className='text-sm text-muted-foreground'>Upload an image of your payment receipt (max 5MB)</p>
+                                            <p className='text-sm text-muted-foreground'>Unggah gambar struk pembayaran Anda (maks 5MB)</p>
                                         </div>
 
                                         <div className='space-y-2'>
-                                            <Label htmlFor='payment_date'>Payment Date *</Label>
+                                            <Label htmlFor='payment_date'>Tanggal Pembayaran *</Label>
                                             <Input
                                                 id='payment_date'
                                                 type='date'
@@ -341,11 +388,11 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                                         </div>
 
                                         <div className='space-y-2'>
-                                            <Label htmlFor='reference_number'>Reference Number (Optional)</Label>
+                                            <Label htmlFor='reference_number'>Nomor Referensi (Opsional)</Label>
                                             <Input
                                                 id='reference_number'
                                                 type='text'
-                                                placeholder='e.g., TXN123456789'
+                                                placeholder='contoh: TXN123456789'
                                                 value={data.reference_number}
                                                 onChange={(e) => setData('reference_number', e.target.value)}
                                             />
@@ -353,10 +400,10 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                                         </div>
 
                                         <div className='space-y-2'>
-                                            <Label htmlFor='notes'>Additional Notes (Optional)</Label>
+                                            <Label htmlFor='notes'>Catatan Tambahan (Opsional)</Label>
                                             <Textarea
                                                 id='notes'
-                                                placeholder='Any additional information about your payment...'
+                                                placeholder='Informasi tambahan tentang pembayaran Anda...'
                                                 value={data.notes}
                                                 onChange={(e) => setData('notes', e.target.value)}
                                                 rows={3}
@@ -366,7 +413,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
 
                                         <div className='flex gap-2'>
                                             <Button type='submit' disabled={processing} variant='agricultural' className='flex-1'>
-                                                {processing ? 'Uploading...' : 'Upload Payment Proof'}
+                                                {processing ? 'Mengunggah...' : 'Unggah Bukti Pembayaran'}
                                             </Button>
                                             <Button
                                                 type='button'
@@ -376,7 +423,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                                                     reset();
                                                 }}
                                             >
-                                                Cancel
+                                                Batal
                                             </Button>
                                         </div>
                                     </form>
@@ -391,7 +438,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                         <Card.CardHeader>
                             <Card.CardTitle className='flex items-center gap-2'>
                                 <User className='h-5 w-5' />
-                                Customer Information
+                                Informasi Pelanggan
                             </Card.CardTitle>
                         </Card.CardHeader>
                         <Card.CardContent className='space-y-4'>
@@ -415,7 +462,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                         <Card.CardHeader>
                             <Card.CardTitle className='flex items-center gap-2'>
                                 <MapPin className='h-5 w-5' />
-                                Shipping Address
+                                Alamat Pengiriman
                             </Card.CardTitle>
                         </Card.CardHeader>
                         <Card.CardContent>
@@ -426,7 +473,7 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
                     {order.notes && (
                         <Card.Card variant='agricultural-glass'>
                             <Card.CardHeader>
-                                <Card.CardTitle>Order Notes</Card.CardTitle>
+                                <Card.CardTitle>Catatan Pesanan</Card.CardTitle>
                             </Card.CardHeader>
                             <Card.CardContent>
                                 <p className='text-sm'>{order.notes}</p>
@@ -436,19 +483,19 @@ export default function OrderDetails({ order, isQrAccess = false, accessToken, c
 
                     <div className='space-y-3'>
                         <Button asChild variant='agricultural' className='w-full'>
-                            <Link href={home()}>Continue Shopping</Link>
+                            <Link href={home()}>Lanjutkan Berbelanja</Link>
                         </Button>
                         {!isQrAccess && (
                             <Button asChild variant='agricultural-outline' className='w-full'>
-                                <Link href={transactions()}>Back to Transactions</Link>
+                                <Link href={transactions()}>Kembali ke Transaksi</Link>
                             </Button>
                         )}
                         {isQrAccess && (
                             <div className='rounded-lg bg-muted p-3'>
-                                <p className='mb-2 text-sm font-medium'>📱 Bookmark this page</p>
+                                <p className='mb-2 text-sm font-medium'>📱 Tandai halaman ini</p>
                                 <p className='text-sm text-muted-foreground'>
-                                    Save this page to check your order status anytime. Your payment will be verified by our admin within 1-2 business
-                                    days.
+                                    Simpan halaman ini untuk memeriksa status pesanan Anda kapan saja. Pembayaran Anda akan diverifikasi oleh admin
+                                    kami dalam 1-2 hari kerja.
                                 </p>
                             </div>
                         )}

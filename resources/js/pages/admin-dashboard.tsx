@@ -34,28 +34,28 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
 
     const statCards = [
         {
-            title: 'Total Orders',
+            title: 'Total Pesanan',
             value: stats.total_orders,
             icon: Package,
             color: 'text-blue-600',
             bgColor: 'bg-blue-50',
         },
         {
-            title: 'Total Revenue',
+            title: 'Total Pendapatan',
             value: formatPrice(stats.total_revenue),
             icon: DollarSign,
             color: 'text-green-600',
             bgColor: 'bg-green-50',
         },
         {
-            title: 'Total Customers',
+            title: 'Total Pelanggan',
             value: stats.total_customers,
             icon: Users,
             color: 'text-purple-600',
             bgColor: 'bg-purple-50',
         },
         {
-            title: 'Total Products',
+            title: 'Total Produk',
             value: stats.total_products,
             icon: ShoppingCart,
             color: 'text-orange-600',
@@ -65,28 +65,28 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
 
     const orderStatusCards = [
         {
-            title: 'Pending Orders',
+            title: 'Pesanan Menunggu',
             value: stats.pending_orders,
             icon: Clock,
             color: 'text-yellow-600',
             bgColor: 'bg-yellow-50',
         },
         {
-            title: 'Confirmed Orders',
+            title: 'Pesanan Dikonfirmasi',
             value: stats.confirmed_orders,
             icon: CheckCircle,
             color: 'text-blue-600',
             bgColor: 'bg-blue-50',
         },
         {
-            title: 'Shipped Orders',
+            title: 'Pesanan Dikirim',
             value: stats.shipped_orders,
             icon: Truck,
             color: 'text-purple-600',
             bgColor: 'bg-purple-50',
         },
         {
-            title: 'Delivered Orders',
+            title: 'Pesanan Diterima',
             value: stats.delivered_orders,
             icon: CheckCircle,
             color: 'text-green-600',
@@ -96,22 +96,22 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
 
     return (
         <AppLayout>
-            <Head title='Admin Dashboard' />
+            <Head title='Dasbor Admin' />
 
             {/* Page Header */}
             <div className='container mx-auto py-8'>
                 <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
                     <div>
                         <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                            Admin Dashboard
+                            Dasbor Admin
                         </h1>
-                        <p className='text-muted-foreground'>Overview of your e-catalog performance</p>
+                        <p className='text-muted-foreground'>Ringkasan kinerja e-katalog Anda</p>
                     </div>
                     <div className='flex items-center gap-3'>
-                        <span className='text-sm text-muted-foreground'>Welcome, {auth.user?.name}</span>
+                        <span className='text-sm text-muted-foreground'>Selamat datang, {auth.user?.name}</span>
                         <Button asChild variant='agricultural-outline'>
                             <Link href={logout()} method='post' as='button'>
-                                Logout
+                                Keluar
                             </Link>
                         </Button>
                     </div>
@@ -121,7 +121,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
             <div className='container mx-auto space-y-8 pb-8'>
                 {/* Overview Stats */}
                 <div>
-                    <h2 className='mb-4 text-xl font-semibold'>Overview</h2>
+                    <h2 className='mb-4 text-xl font-semibold'>Ringkasan</h2>
                     <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
                         {statCards.map((stat) => (
                             <Card.Card key={stat.title} variant='agricultural-glass'>
@@ -143,7 +143,7 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
 
                 {/* Order Status */}
                 <div className='mb-8'>
-                    <h2 className='mb-4 text-xl font-semibold'>Order Status</h2>
+                    <h2 className='mb-4 text-xl font-semibold'>Status Pesanan</h2>
                     <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
                         {orderStatusCards.map((stat) => (
                             <Card.Card key={stat.title} variant='agricultural-glass'>
@@ -165,18 +165,18 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
 
                 {/* Quick Actions */}
                 <div className='mb-8'>
-                    <h2 className='mb-4 text-xl font-semibold'>Quick Actions</h2>
+                    <h2 className='mb-4 text-xl font-semibold'>Aksi Cepat</h2>
                     <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
                         <Card.Card variant='agricultural-glass'>
                             <Card.CardContent className='p-6'>
                                 <div className='flex items-center gap-4'>
                                     <Package className='h-8 w-8 text-primary' />
                                     <div className='flex-1'>
-                                        <h3 className='font-semibold'>Manage Orders</h3>
-                                        <p className='text-sm text-muted-foreground'>View and update order statuses</p>
+                                        <h3 className='font-semibold'>Kelola Pesanan</h3>
+                                        <p className='text-sm text-muted-foreground'>Lihat dan perbarui status pesanan</p>
                                     </div>
                                     <Button asChild variant='agricultural'>
-                                        <Link href='/admin/orders'>Go</Link>
+                                        <Link href='/admin/orders'>Buka</Link>
                                     </Button>
                                 </div>
                             </Card.CardContent>
@@ -187,11 +187,11 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                                 <div className='flex items-center gap-4'>
                                     <ShoppingCart className='h-8 w-8 text-primary' />
                                     <div className='flex-1'>
-                                        <h3 className='font-semibold'>Manage Products</h3>
-                                        <p className='text-sm text-muted-foreground'>Add, edit, and organize products</p>
+                                        <h3 className='font-semibold'>Kelola Produk</h3>
+                                        <p className='text-sm text-muted-foreground'>Tambah, edit, dan atur produk</p>
                                     </div>
                                     <Button asChild variant='agricultural'>
-                                        <Link href='/products'>Go</Link>
+                                        <Link href='/products'>Buka</Link>
                                     </Button>
                                 </div>
                             </Card.CardContent>
@@ -202,11 +202,11 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                                 <div className='flex items-center gap-4'>
                                     <Settings className='h-8 w-8 text-primary' />
                                     <div className='flex-1'>
-                                        <h3 className='font-semibold'>Settings</h3>
-                                        <p className='text-sm text-muted-foreground'>Configure system settings</p>
+                                        <h3 className='font-semibold'>Pengaturan</h3>
+                                        <p className='text-sm text-muted-foreground'>Konfigurasi pengaturan sistem</p>
                                     </div>
                                     <Button asChild variant='agricultural'>
-                                        <Link href='/settings'>Go</Link>
+                                        <Link href='/settings'>Buka</Link>
                                     </Button>
                                 </div>
                             </Card.CardContent>
@@ -219,12 +219,12 @@ export default function AdminDashboard({ stats }: AdminDashboardProps) {
                     <Card.CardHeader>
                         <Card.CardTitle className='flex items-center gap-2'>
                             <TrendingUp className='h-5 w-5' />
-                            Recent Activity
+                            Aktivitas Terbaru
                         </Card.CardTitle>
                     </Card.CardHeader>
                     <Card.CardContent>
                         <div className='py-8 text-center'>
-                            <p className='text-muted-foreground'>Recent activity will be displayed here</p>
+                            <p className='text-muted-foreground'>Aktivitas terbaru akan ditampilkan di sini</p>
                         </div>
                     </Card.CardContent>
                 </Card.Card>

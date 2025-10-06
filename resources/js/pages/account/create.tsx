@@ -47,42 +47,42 @@ export default function Create() {
                     <Button variant='outline' size='sm' asChild>
                         <Link href={AccountController.index().url}>
                             <ArrowLeft className='h-4 w-4' />
-                            Back to Accounts
+                            Kembali ke Akun
                         </Link>
                     </Button>
                     <div>
-                        <h1 className='text-3xl font-bold tracking-tight'>Create Account</h1>
-                        <p className='text-muted-foreground'>Add a new payment account to your system</p>
+                        <h1 className='text-3xl font-bold tracking-tight'>Buat Akun</h1>
+                        <p className='text-muted-foreground'>Tambahkan akun pembayaran baru ke sistem Anda</p>
                     </div>
                 </div>
 
                 <Card className='max-w-2xl'>
                     <CardHeader>
-                        <CardTitle>Account Information</CardTitle>
-                        <CardDescription>Enter the details for the new payment account</CardDescription>
+                        <CardTitle>Informasi Akun</CardTitle>
+                        <CardDescription>Masukkan detail untuk akun pembayaran baru</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className='space-y-6'>
                             <div className='grid grid-cols-2 gap-4'>
                                 <div className='space-y-2'>
-                                    <Label htmlFor='account_name'>Account Name *</Label>
+                                    <Label htmlFor='account_name'>Nama Akun *</Label>
                                     <Input
                                         id='account_name'
                                         value={data.account_name}
                                         onChange={(e) => setData('account_name', e.target.value)}
-                                        placeholder='e.g., BCA Savings'
+                                        placeholder='mis., BCA Tabungan'
                                         required
                                     />
                                     {errors.account_name && <p className='text-sm text-destructive'>{errors.account_name}</p>}
                                 </div>
 
                                 <div className='space-y-2'>
-                                    <Label htmlFor='owner_name'>Owner Name *</Label>
+                                    <Label htmlFor='owner_name'>Nama Pemilik *</Label>
                                     <Input
                                         id='owner_name'
                                         value={data.owner_name}
                                         onChange={(e) => setData('owner_name', e.target.value)}
-                                        placeholder='e.g., John Doe'
+                                        placeholder='mis., John Doe'
                                         required
                                     />
                                     {errors.owner_name && <p className='text-sm text-destructive'>{errors.owner_name}</p>}
@@ -91,12 +91,12 @@ export default function Create() {
 
                             <div className='grid grid-cols-2 gap-4'>
                                 <div className='space-y-2'>
-                                    <Label htmlFor='account_no'>Account Number *</Label>
+                                    <Label htmlFor='account_no'>Nomor Rekening *</Label>
                                     <Input
                                         id='account_no'
                                         value={data.account_no}
                                         onChange={(e) => setData('account_no', e.target.value)}
-                                        placeholder='e.g., 1234567890'
+                                        placeholder='mis., 1234567890'
                                         required
                                     />
                                     {errors.account_no && <p className='text-sm text-destructive'>{errors.account_no}</p>}

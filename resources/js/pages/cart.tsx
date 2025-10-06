@@ -28,7 +28,7 @@ export default function Cart() {
 
     return (
         <>
-            <Head title='Shopping Cart' />
+            <Head title='Keranjang Belanja' />
             <div className='relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950'>
                 {/* Background decoration */}
                 <div className='absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]'></div>
@@ -42,7 +42,7 @@ export default function Cart() {
                                 className='flex items-center gap-2 text-emerald-600 transition-colors duration-300 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300'
                             >
                                 <ArrowLeft className='h-5 w-5' />
-                                <span className='hidden font-medium sm:inline'>Back to catalog</span>
+                                <span className='hidden font-medium sm:inline'>Kembali ke katalog</span>
                             </Link>
                             <Separator orientation='vertical' className='h-6' />
                             <div className='relative'>
@@ -51,9 +51,9 @@ export default function Cart() {
                             </div>
                             <div>
                                 <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                    Shopping Cart
+                                    Keranjang Belanja
                                 </h1>
-                                <p className='text-xs text-muted-foreground'>Premium Agricultural Products</p>
+                                <p className='text-xs text-muted-foreground'>Produk Pertanian Premium</p>
                             </div>
                         </div>
                         <nav className='flex items-center gap-3'>
@@ -82,7 +82,7 @@ export default function Cart() {
                                     className='inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-medium text-white shadow-lg ring-offset-background transition-colors hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
                                 >
                                     <Sparkles className='mr-2 h-4 w-4' />
-                                    Dashboard
+                                    Dasbor
                                 </Link>
                             ) : (
                                 <>
@@ -91,7 +91,7 @@ export default function Cart() {
                                         variant='outline'
                                         className='border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950'
                                     >
-                                        <Link href={login()}>Log in</Link>
+                                        <Link href={login()}>Masuk</Link>
                                     </Button>
                                     <Button
                                         asChild
@@ -99,7 +99,7 @@ export default function Cart() {
                                     >
                                         <Link href={register()}>
                                             <Heart className='mr-2 h-4 w-4' />
-                                            Join Us
+                                            Bergabung
                                         </Link>
                                     </Button>
                                 </>
@@ -116,9 +116,9 @@ export default function Cart() {
                                 <div className='mb-8 flex items-center justify-between'>
                                     <div>
                                         <h2 className='bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-3xl font-bold text-transparent dark:from-slate-100 dark:to-slate-400'>
-                                            Your Cart
+                                            Keranjang Anda
                                         </h2>
-                                        <p className='mt-1 text-slate-600 dark:text-slate-400'>{getTotalItems()} premium items ready for checkout</p>
+                                        <p className='mt-1 text-slate-600 dark:text-slate-400'>{getTotalItems()} item premium siap untuk checkout</p>
                                     </div>
                                     <Button
                                         variant='agricultural-outline'
@@ -127,7 +127,7 @@ export default function Cart() {
                                         className='border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300'
                                     >
                                         <Trash2 className='mr-2 h-4 w-4' />
-                                        Clear cart
+                                        Kosongkan keranjang
                                     </Button>
                                 </div>
 
@@ -242,21 +242,21 @@ export default function Cart() {
                                                 <div className='absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full bg-emerald-400'></div>
                                             </div>
                                             <span className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                                Order Summary
+                                                Ringkasan Pesanan
                                             </span>
                                         </Card.CardTitle>
                                     </Card.CardHeader>
                                     <Card.CardContent className='space-y-6'>
                                         <div className='space-y-4'>
                                             <div className='flex items-center justify-between rounded-lg bg-emerald-50 p-3 dark:bg-emerald-950'>
-                                                <span className='font-medium text-emerald-700 dark:text-emerald-300'>Items ({getTotalItems()})</span>
+                                                <span className='font-medium text-emerald-700 dark:text-emerald-300'>Item ({getTotalItems()})</span>
                                                 <span className='font-bold text-emerald-800 dark:text-emerald-200'>
                                                     {formatPrice(getTotalPrice())}
                                                 </span>
                                             </div>
                                             <div className='flex items-center justify-between rounded-lg bg-blue-50 p-3 dark:bg-blue-950'>
-                                                <span className='font-medium text-blue-700 dark:text-blue-300'>Shipping</span>
-                                                <span className='font-medium text-blue-600 dark:text-blue-400'>Calculated at checkout</span>
+                                                <span className='font-medium text-blue-700 dark:text-blue-300'>Pengiriman</span>
+                                                <span className='font-medium text-blue-600 dark:text-blue-400'>Dihitung saat checkout</span>
                                             </div>
                                         </div>
                                         <Separator className='h-px bg-gradient-to-r from-emerald-200 to-teal-200 dark:from-emerald-800 dark:to-teal-800' />
@@ -271,13 +271,13 @@ export default function Cart() {
                                         <Button asChild variant='agricultural' className='h-12 w-full' size='lg'>
                                             <Link href={checkout()}>
                                                 <CheckCircle className='mr-2 h-5 w-5' />
-                                                Proceed to Checkout
+                                                Lanjutkan ke Checkout
                                             </Link>
                                         </Button>
                                         <Button variant='agricultural-outline' className='h-12 w-full' asChild>
                                             <Link href={home()}>
                                                 <Sparkles className='mr-2 h-4 w-4' />
-                                                Continue Shopping
+                                                Lanjutkan Belanja
                                             </Link>
                                         </Button>
                                     </Card.CardFooter>
@@ -291,14 +291,14 @@ export default function Cart() {
                                 <ShoppingCart className='h-24 w-24 text-slate-400 dark:text-slate-600' />
                                 <div className='absolute -top-2 -right-2 h-8 w-8 animate-ping rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 opacity-60'></div>
                             </div>
-                            <h2 className='mb-4 text-3xl font-bold text-slate-900 dark:text-slate-100'>Your cart is empty</h2>
+                            <h2 className='mb-4 text-3xl font-bold text-slate-900 dark:text-slate-100'>Keranjang Anda kosong</h2>
                             <p className='mb-8 max-w-md leading-relaxed text-slate-600 dark:text-slate-400'>
-                                Looks like you haven't added any premium agricultural products to your cart yet. Start exploring our fresh collection!
+                                Sepertinya Anda belum menambahkan produk pertanian premium ke keranjang. Mulai jelajahi koleksi segar kami!
                             </p>
                             <Button asChild size='lg' variant='agricultural'>
                                 <Link href={home()}>
                                     <Leaf className='mr-2 h-5 w-5' />
-                                    Discover Fresh Products
+                                    Temukan Produk Segar
                                 </Link>
                             </Button>
                         </div>
