@@ -42,8 +42,8 @@ export default function Create() {
         <AppLayout>
             <Head title='Create Account' />
 
-            <div className='space-y-6'>
-                <div className='flex items-center gap-4'>
+            <div className='container mx-auto py-8'>
+                <div className='mb-8 flex items-center gap-4'>
                     <Button variant='outline' size='sm' asChild>
                         <Link href={AccountController.index().url}>
                             <ArrowLeft className='h-4 w-4' />

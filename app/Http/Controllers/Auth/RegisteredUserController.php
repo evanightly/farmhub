@@ -49,6 +49,6 @@ class RegisteredUserController extends Controller {
             return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
-        return redirect()->intended(route('transactions', absolute: false));
+        return redirect(route('transactions', absolute: false));
     }
 }

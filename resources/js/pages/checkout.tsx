@@ -205,7 +205,7 @@ export default function Checkout({ accounts }: CheckoutProps) {
                             </div>
                             <div>
                                 <h1 className='bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-2xl font-bold text-transparent dark:from-emerald-400 dark:to-teal-400'>
-                                    Checkout Aman
+                                    Checkout
                                 </h1>
                                 <p className='flex items-center gap-1 text-xs text-muted-foreground'>
                                     <Shield className='h-3 w-3' />
