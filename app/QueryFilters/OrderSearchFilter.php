@@ -1,0 +1,17 @@
+<?php
+
+namespace App\QueryFilters;
+
+use Spatie\QueryBuilder\AllowedFilter;
+
+class OrderSearchFilter {
+    public static function make(array $columns = ['id', 'customer_name', 'customer_email']): AllowedFilter {
+        return AllowedFilter::callback('search', function ($query, $value) use ($columns) {
+            $query->where(function ($q) use ($value, $columns) {
+                foreach ($columns as $column) {
+                    $q->orWhere($column, 'like', "%{$value}%");
+                }
+            });
+        });
+    }
+}

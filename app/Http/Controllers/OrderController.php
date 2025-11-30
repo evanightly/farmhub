@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Product;
+use App\QueryFilters\OrderSearchFilter;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -21,6 +22,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class OrderController extends Controller {
     public function index() {
@@ -308,33 +311,23 @@ class OrderController extends Controller {
             abort(403, 'Admin or employee access required.');
         }
 
-        $query = Order::query()->with(['order_items.product', 'payment']);
+        $query = QueryBuilder::for(Order::class)
+            ->with(['order_items.product', 'payment'])
+            ->allowedFilters([
+                OrderSearchFilter::make(['id', 'customer_name', 'customer_email']),
+                AllowedFilter::exact('status'),
+                AllowedFilter::exact('payment_status'),
+                AllowedFilter::callback('date_from', function ($query, $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('date_to', function ($query, $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
+            ])
+            ->defaultSort('-created_at');
 
-        if ($search = $request->input('filter.search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('id', 'like', "%{$search}%")
-                    ->orWhere('customer_name', 'like', "%{$search}%")
-                    ->orWhere('customer_email', 'like', "%{$search}%");
-            });
-        }
-
-        if ($status = $request->input('filter.status')) {
-            $query->where('status', $status);
-        }
-
-        if ($paymentStatus = $request->input('filter.payment_status')) {
-            $query->where('payment_status', $paymentStatus);
-        }
-
-        if ($dateFrom = $request->input('filter.date_from')) {
-            $query->whereDate('created_at', '>=', $dateFrom);
-        }
-
-        if ($dateTo = $request->input('filter.date_to')) {
-            $query->whereDate('created_at', '<=', $dateTo);
-        }
-
-        $orders = $query->orderBy('created_at', 'desc')->paginate(15);
+        $perPage = $request->input('per_page', 15);
+        $orders = $query->paginate($perPage)->appends($request->query());
 
         return Inertia::render('admin-orders', [
             'orders' => $orders->through(fn ($order) => OrderData::from($order)),

@@ -7,29 +7,45 @@ use App\Http\Requests\StorePaymentRequest;
 use App\Http\Requests\UpdatePaymentRequest;
 use App\Models\Order;
 use App\Models\Payment;
+use App\QueryFilters\PaymentSearchFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class PaymentController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
+    public function index(Request $request) {
         // Ensure only admin or employee can access
         if (!Auth::check() || (Auth::user()?->role !== 'admin' && Auth::user()?->role !== 'employee')) {
             abort(403, 'Admin or employee access required.');
         }
 
-        $payments = Payment::with(['order', 'account', 'verifier'])
+        $query = QueryBuilder::for(Payment::class)
+            ->with(['order', 'account', 'verifier'])
             ->where('verified_at', null)
             ->whereNotNull('proof_image_path')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->allowedFilters([
+                PaymentSearchFilter::make(['reference_number']),
+                AllowedFilter::callback('date_from', function ($query, $value) {
+                    $query->whereDate('created_at', '>=', $value);
+                }),
+                AllowedFilter::callback('date_to', function ($query, $value) {
+                    $query->whereDate('created_at', '<=', $value);
+                }),
+            ])
+            ->defaultSort('-created_at');
+
+        $perPage = $request->input('per_page', 15);
+        $payments = $query->paginate($perPage)->appends($request->query());
 
         return Inertia::render('admin-payments', [
             'payments' => $payments->through(fn ($payment) => PaymentData::from($payment)),
+            'filters' => $request->only(['filter', 'sort', 'page', 'per_page']),
         ]);
     }
 

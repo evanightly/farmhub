@@ -23,9 +23,19 @@ interface AdminPaymentsProps {
             total: number;
         };
     };
+    filters: {
+        filter?: {
+            search?: string;
+            date_from?: string;
+            date_to?: string;
+        };
+        sort?: string;
+        page?: number;
+        per_page?: number;
+    };
 }
 
-export default function AdminPayments({ payments }: AdminPaymentsProps) {
+export default function AdminPayments({ payments, filters }: AdminPaymentsProps) {
     const { auth } = usePage<SharedData>().props;
     const [selectedPayment, setSelectedPayment] = useState<App.Data.PaymentData | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -192,8 +202,8 @@ export default function AdminPayments({ payments }: AdminPaymentsProps) {
                 title='Pembayaran'
                 data={payments.data}
                 columns={columns}
-                pagination={payments.meta as any}
-                filters={{}}
+                pagination={payments as any}
+                filters={filters?.filter || {}}
                 searchPlaceholder='Cari pembayaran berdasarkan ID pesanan, nama pelanggan, atau referensi...'
                 emptyMessage='Tidak ada pembayaran menunggu'
                 emptyDescription='Bukti pembayaran yang memerlukan verifikasi akan muncul di sini.'

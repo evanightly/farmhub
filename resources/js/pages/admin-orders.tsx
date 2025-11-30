@@ -283,7 +283,7 @@ export default function AdminOrders({ orders, filters }: AdminOrdersProps) {
                 title='Pesanan'
                 data={orders.data}
                 columns={columns}
-                pagination={orders.meta as any}
+                pagination={orders as any}
                 filters={filters.filter || {}}
                 searchPlaceholder='Cari pesanan berdasarkan ID, nama pelanggan, atau email...'
                 emptyMessage='Tidak ada pesanan ditemukan'
